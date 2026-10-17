@@ -171,6 +171,17 @@ label.f>*:not(span){color:var(--ink);font-weight:400}
 .sheet .foot{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
 .sheet .foot .grow{flex:1}
 .note{font-size:13px;color:var(--muted);margin:10px 0 0}
+.help{background:var(--surface);border:1px solid var(--line);border-radius:12px;margin-bottom:14px}
+.help summary{cursor:pointer;padding:10px 14px;font-weight:600;font-size:14px;list-style:none;display:flex;align-items:center;gap:8px}
+.help summary::-webkit-details-marker{display:none}
+.help summary::before{content:"?";display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-size:12px}
+.help ul{margin:0;padding:0 14px 12px 34px;color:var(--muted);font-size:14px}
+.help li+li{margin-top:4px}
+.tour-n{font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:6px}
+.tour p{font-size:15.5px;margin:0 0 10px}
+.dots{display:flex;gap:6px;margin:14px 0 4px}
+.dots i{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.dots i.on{background:var(--accent)}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:50;
   background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:20px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s}
 .toast.on{opacity:1}
@@ -184,7 +195,7 @@ label.f>*:not(span){color:var(--ink);font-weight:400}
   <main class="main">
     <header class="top">
       <h1 id="title">Resumen</h1>
-      <button class="icon-btn" data-a="settings" aria-label="Ajustes"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg></button>
+      <div style="display:flex;gap:8px"><button class="icon-btn" data-a="tour" aria-label="Ver el tutorial" style="font-weight:700;font-family:var(--f-display);font-size:18px">?</button><button class="icon-btn" data-a="settings" aria-label="Ajustes"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg></button></div>
     </header>
     <div id="banner"></div>
     <div id="view"></div>
@@ -210,6 +221,24 @@ var NAV=[
  ['deudas','Deudas','<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/>']
 ];
 var TITLES={resumen:'Resumen',movimientos:'Movimientos',presupuesto:'Presupuesto mensual',metas:'Ahorro y metas',deudas:'Deudas'};
+/* Tutorial de bienvenida y ayuda por sección */
+var TOUR=[
+ {v:'resumen',t:'Bienvenido a Plata Clara',p:'Aquí anotas lo que ganas y lo que gastas, y la app te muestra cuánto te queda. Este recorrido dura un minuto. Los datos que ves ahora son de ejemplo, para que pruebes sin miedo.'},
+ {v:'movimientos',t:'Anota un movimiento',p:'Pulsa “+ Nuevo” y elige el tipo: Ingreso (dinero que entra), Gasto (dinero que sale), Ahorro (dinero que apartas) o Deuda (pago de una cuota). Escribe el monto, la fecha y guarda.',n:'Para corregir algo, toca el movimiento en la lista: puedes editarlo o eliminarlo.'},
+ {v:'resumen',t:'Mira tu resumen',p:'Disponible es lo que te queda del mes: ingresos menos gastos, ahorro y pagos de deuda. Cambia de mes con las flechas. El gráfico compara tus últimos 6 meses.'},
+ {v:'presupuesto',t:'Ponle límite a tus gastos',p:'En Presupuesto escribe cuánto quieres gastar al mes en cada categoría, por ejemplo Alimentación. La barra se pone ámbar cuando te acercas al límite y dice “Excedido” si te pasas.'},
+ {v:'metas',t:'Ahorra para una meta',p:'Crea una meta con su monto y fecha, y pulsa “Aportar” cada vez que guardes dinero. Si ya tenías dinero ahorrado antes de usar la app, elige “Ya lo tenía ahorrado” para que no reste de tu Disponible de este mes.'},
+ {v:'deudas',t:'Controla tus deudas',p:'Registra cada deuda con su monto total y su cuota mensual. Cada vez que pagues, pulsa “Registrar pago”: verás cuánto falta y cuántas cuotas quedan.'},
+ {v:'resumen',t:'Tus datos',p:'Todo se guarda en este dispositivo y en este navegador. Si cambias de celular o borras los datos del navegador, se pierden. Cuando quieras empezar con lo tuyo, pulsa “Empezar con mis datos”.',n:'En iPhone: abre la app en Safari, toca Compartir y elige “Agregar a pantalla de inicio”. Puedes volver a ver este recorrido con el botón ? de arriba.'}
+];
+var HELP={
+ resumen:['Disponible = ingresos − gastos − ahorro − pagos de deuda del mes.','Cambia de mes con las flechas de arriba.','Toca “+ Nuevo” para registrar un movimiento desde aquí.'],
+ movimientos:['Toca “+ Nuevo” para anotar un ingreso, gasto, ahorro o pago de deuda.','Toca un movimiento de la lista para editarlo o eliminarlo.','Usa los botones de arriba para ver solo un tipo de movimiento.'],
+ presupuesto:['Escribe un límite en cada categoría y se guarda solo.','Déjalo vacío si no quieres limitar esa categoría.','El límite vale para todos los meses; el gasto que ves es el del mes elegido.'],
+ metas:['“Nueva meta”: ponle nombre, monto y fecha.','“Aportar” suma dinero a la meta y lo anota como movimiento de ahorro.','“Ya tengo ahorrado” es para lo que tenías antes de usar la app.'],
+ deudas:['“Nueva deuda”: escribe el total, lo que ya pagaste y la cuota mensual.','“Registrar pago” suma a lo pagado y lo anota como movimiento.','Cuando una deuda llega a cero aparece como Pagada.']
+};
+function helpHTML(v){return '<details class="help"><summary>¿Cómo funciona esta sección?</summary><ul>'+HELP[v].map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul></details>';}
 
 /* ---------- helpers ---------- */
 function pad(n){return String(n).padStart(2,'0');}
@@ -261,7 +290,7 @@ var mem=null;
 function load(){try{var s=localStorage.getItem(KEY);if(s){var d=JSON.parse(s);if(d&&d.moves)return d;}}catch(e){}return mem;}
 function save(){mem=S;try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 var S=load()||seedData();
-var ui={view:'resumen',month:iso(new Date()).slice(0,7),filter:'Todos',sheet:null};
+var ui={view:'resumen',month:iso(new Date()).slice(0,7),filter:'Todos',sheet:S.seen?null:{kind:'tour',step:0,noFocus:true}};
 if(location.hash){var h=location.hash.slice(1);if(TITLES[h])ui.view=h;}
 
 /* ---------- cálculos ---------- */
@@ -431,9 +460,15 @@ function sheetHTML(){
       +'<label class="f"><span>Fecha</span><input id="q-date" type="date" name="date" required value="'+iso(new Date())+'"></label></div>'
       +(isG?'<label class="f" style="margin-top:12px"><span>¿De dónde viene?</span><select id="q-origin" name="origin"><option value="">De mis ingresos de este mes</option><option value="prior">Ya lo tenía ahorrado</option></select></label>':'')
       +'<p class="note">Se guarda también como movimiento de '+(isG?'ahorro':'pago de deuda')+'.</p><div class="foot"><button class="btn grow" type="submit">Guardar</button><button class="btn alt" type="button" data-a="close">Cancelar</button></div></form>';
+  }else if(s.kind==='tour'){
+    var T=TOUR[s.step],last=s.step===TOUR.length-1;
+    h='<div class="tour"><div class="tour-n">Paso '+(s.step+1)+' de '+TOUR.length+'</div><h2>'+T.t+'</h2><p>'+T.p+'</p>'+(T.n?'<p class="note">'+T.n+'</p>':'')
+      +'<div class="dots" aria-hidden="true">'+TOUR.map(function(x,i){return '<i class="'+(i===s.step?'on':'')+'"></i>';}).join('')+'</div>'
+      +'<div class="foot">'+(s.step>0?'<button class="btn alt" data-a="tour-prev">Anterior</button>':'<button class="btn alt" data-a="close">Saltar</button>')
+      +'<button class="btn grow" data-a="'+(last?'close':'tour-next')+'">'+(last?'Empezar':'Siguiente')+'</button></div></div>';
   }else if(s.kind==='settings'){
     h='<h2>Ajustes</h2><div class="fgrid"><label class="f full"><span>Moneda</span><select id="s-cur" data-a-change="cur">'+['S/','$','€','US$'].map(function(c){return '<option'+(c===S.cur?' selected':'')+'>'+c+'</option>';}).join('')+'</select></label></div>'
-      +'<div class="foot"><button class="btn alt" data-a="loaddemo">Cargar datos de ejemplo</button><button class="btn danger" data-a="clearall">Borrar todo y empezar</button></div>'
+      +'<div class="foot"><button class="btn alt" data-a="tour">Ver el tutorial</button><button class="btn alt" data-a="loaddemo">Cargar datos de ejemplo</button><button class="btn danger" data-a="clearall">Borrar todo y empezar</button></div>'
       +'<p class="note">En esta versión de prueba tus datos se guardan solo en este dispositivo y navegador.</p><div class="foot"><button class="btn grow" data-a="close">Listo</button></div>';
   }
   return '<div class="overlay" data-a="overlay"><div class="sheet" role="dialog" aria-modal="true">'+h+'</div></div>';
@@ -446,14 +481,14 @@ function render(){
   document.getElementById('bottom').innerHTML=nav;
   document.getElementById('title').textContent=TITLES[ui.view];
   document.getElementById('banner').innerHTML=S.demo?'<div class="banner"><span><b>Estás viendo datos de ejemplo.</b> Pruébalos y, cuando quieras, empieza con los tuyos.</span><button class="btn sm" data-a="clearall">Empezar con mis datos</button></div>':'';
-  var v={resumen:vResumen,movimientos:vMovs,presupuesto:vPresu,metas:vMetas,deudas:vDeudas}[ui.view]();
+  var v=helpHTML(ui.view)+{resumen:vResumen,movimientos:vMovs,presupuesto:vPresu,metas:vMetas,deudas:vDeudas}[ui.view]();
   if(ui.view==='movimientos'||ui.view==='resumen')v+='<button class="btn fab" data-a="new">+ Nuevo</button>';
   document.getElementById('view').innerHTML=v;
   var sh=document.getElementById('sheet');
   if(ui.sheet){sh.innerHTML=sheetHTML();var f=sh.querySelector('input:not([type=radio]),select');if(f&&!ui.sheet.noFocus)f.focus();}else sh.innerHTML='';
 }
 function toast(t){var el=document.getElementById('toast');el.textContent=t;el.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){el.classList.remove('on');},2000);}
-function closeSheet(){ui.sheet=null;render();}
+function closeSheet(){if(ui.sheet&&ui.sheet.kind==='tour'){if(!S.seen){S.seen=true;save();}ui.view='resumen';}ui.sheet=null;render();}
 
 /* ---------- eventos ---------- */
 document.addEventListener('click',function(e){
@@ -473,6 +508,8 @@ document.addEventListener('click',function(e){
   else if(a==='contrib'){ui.sheet={kind:'quick',of:'goal',id:id};render();}
   else if(a==='pay'){ui.sheet={kind:'quick',of:'debt',id:id};render();}
   else if(a==='settings'){ui.sheet={kind:'settings'};render();}
+  else if(a==='tour-next'||a==='tour-prev'){var st=ui.sheet.step+(a==='tour-next'?1:-1);ui.sheet={kind:'tour',step:st,noFocus:true};ui.view=TOUR[st].v;render();}
+  else if(a==='tour'){ui.sheet={kind:'tour',step:0,noFocus:true};ui.view=TOUR[0].v;render();}
   else if(a==='close'){closeSheet();}
   else if(a==='del'){
     if(!el.dataset.armed){el.dataset.armed='1';el.textContent='Toca otra vez para eliminar';return;}
@@ -482,8 +519,8 @@ document.addEventListener('click',function(e){
     if(s.kind==='debt'){S.debts=S.debts.filter(function(d){return d.id!==s.id;});S.moves.forEach(function(m){if(m.debtId===s.id)delete m.debtId;});}
     save();closeSheet();toast('Eliminado');
   }
-  else if(a==='loaddemo'){S=seedData();save();ui.sheet=null;render();toast('Datos de ejemplo cargados');}
-  else if(a==='clearall'){var c=S.cur;S=emptyData(c);save();ui.sheet=null;render();toast('Listo, empieza desde cero');}
+  else if(a==='loaddemo'){S=seedData();S.seen=true;save();ui.sheet=null;render();toast('Datos de ejemplo cargados');}
+  else if(a==='clearall'){var c=S.cur;S=emptyData(c);S.seen=true;save();ui.sheet=null;render();toast('Listo, empieza desde cero');}
 });
 document.addEventListener('change',function(e){
   var t=e.target;
