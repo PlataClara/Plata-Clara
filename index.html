@@ -835,5 +835,20 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ui.sheet)cl
 render();
 })();
 </script>
+<script>
+/* Actualización automática: registra el service worker y recarga cuando hay versión nueva */
+(function(){
+  if(!('serviceWorker' in navigator))return;
+  var hadController=!!navigator.serviceWorker.controller,reloaded=false;
+  navigator.serviceWorker.addEventListener('controllerchange',function(){
+    if(!hadController){hadController=true;return;}
+    if(reloaded)return;reloaded=true;location.reload();
+  });
+  navigator.serviceWorker.register('sw.js').then(function(reg){
+    reg.update();
+    document.addEventListener('visibilitychange',function(){if(!document.hidden)reg.update();});
+  }).catch(function(){});
+})();
+</script>
 </body>
 </html>
