@@ -10,6 +10,14 @@
   var btn = document.getElementById('b-account');
   if (btn) btn.hidden = false;
 
+  var root = document.documentElement;
+  function lock() { root.classList.add('pc-lock'); }
+  function unlock() { if (!root.classList.contains('pc-lock')) return; root.classList.remove('pc-lock'); if (ov) close(); }
+  function wipeLocal() {
+    applying = true;
+    try { window.__pc.apply(window.__pc.empty()); } finally { applying = false; }
+    setMark({});
+  }
   function getMark() { try { return JSON.parse(localStorage.getItem(SYNC_KEY)) || {}; } catch (e) { return {}; } }
   function setMark(o) { try { localStorage.setItem(SYNC_KEY, JSON.stringify(o)); } catch (e) {} }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
@@ -33,6 +41,7 @@
       sb.auth.onAuthStateChange(function (ev, session) {
         var prev = user && user.id;
         user = session ? session.user : null;
+        if (!user && ev === 'SIGNED_OUT') { lock(); authSheet('login'); }
         paint();
         if (user && user.id !== prev && ev !== 'TOKEN_REFRESHED') reconcile();
       });
@@ -104,15 +113,25 @@
       '#pc-ov .pc-b.alt{background:var(--surface2);color:var(--ink);border:1px solid var(--line)}#pc-ov .pc-b[disabled]{opacity:.6}' +
       '#pc-ov .pc-l{background:none;border:0;color:var(--accent);padding:6px 0;margin-top:8px;font-size:14px;text-decoration:underline}' +
       '#pc-ov .pc-m{margin-top:10px;font-size:14px;min-height:18px}#pc-ov .pc-m.e{color:var(--exp)}#pc-ov .pc-m.o{color:var(--inc)}' +
+      '#pc-ov.gate{z-index:1000;flex-direction:column;gap:18px;overflow:auto;background:radial-gradient(circle at 12% 8%,rgba(255,206,84,.55),transparent 38%),radial-gradient(circle at 92% 92%,rgba(40,220,170,.55),transparent 45%),linear-gradient(160deg,#0A5A43 0%,#0E8A67 55%,#13B98D 100%)}' +
+      '#pc-ov .pc-hero{text-align:center;color:#fff;margin-top:auto}' +
+      '#pc-ov .pc-logo{width:68px;height:68px;border-radius:22px;background:#fff;color:#0E6B50;font:800 30px/68px var(--f-display);margin:0 auto 12px;box-shadow:0 12px 30px rgba(0,0,0,.28)}' +
+      '#pc-ov .pc-name{font:700 32px var(--f-display);letter-spacing:-.01em}' +
+      '#pc-ov .pc-tag{opacity:.92;font-size:15.5px;margin-top:3px}' +
+      '#pc-ov.gate .pc-card{margin-bottom:auto;--surface:#fff;--surface2:#F3F8F5;--ink:#12201A;--muted:#566860;--line:#D3DED8;--accent:#0E6B50;--accent-ink:#fff;border-radius:24px;box-shadow:0 24px 60px rgba(0,0,0,.35);padding:24px}' +
+      '#pc-ov.gate .pc-b{background:linear-gradient(135deg,#0E6B50,#12A37A);box-shadow:0 8px 18px rgba(14,107,80,.35)}' +
+      '#pc-ov.gate input:focus{outline:2px solid #12A37A;border-color:#12A37A}' +
       '#b-account.on{color:var(--accent)}';
     document.head.appendChild(s);
   }
   function close() { if (ov) { ov.remove(); ov = null; } }
   function show(html, bind) {
     css(); close();
-    ov = document.createElement('div'); ov.id = 'pc-ov';
-    ov.innerHTML = '<div class="pc-card" role="dialog" aria-modal="true">' + html + '</div>';
-    ov.addEventListener('click', function (e) { if (e.target === ov) close(); });
+    var gate = !user;
+    ov = document.createElement('div'); ov.id = 'pc-ov'; if (gate) ov.className = 'gate';
+    ov.innerHTML = (gate ? '<div class="pc-hero"><div class="pc-logo">S/</div><div class="pc-name">Plata Clara</div><div class="pc-tag">Tus finanzas, claras y en orden</div></div>' : '') +
+      '<div class="pc-card" role="dialog" aria-modal="true">' + html + '</div>';
+    if (!gate) ov.addEventListener('click', function (e) { if (e.target === ov) close(); });
     document.body.appendChild(ov);
     if (bind) bind(ov);
     var f = ov.querySelector('input'); if (f) f.focus();
@@ -141,21 +160,20 @@
       (reset ? '<button class="pc-l" data-m="login">Volver</button>' :
         '<button class="pc-l" data-m="' + (reg ? 'login' : 'register') + '">' + (reg ? 'Ya tengo cuenta' : 'No tengo cuenta, crear una') + '</button>' +
         (reg ? '' : '<br><button class="pc-l" data-m="reset">Olvidé mi contraseña</button>')) +
-      '<button class="pc-b alt" data-x>Seguir sin cuenta</button>',
+      '',
       function (o) {
         o.querySelectorAll('[data-m]').forEach(function (b) { b.onclick = function () { authSheet(b.getAttribute('data-m')); }; });
-        o.querySelector('[data-x]').onclick = close;
         o.querySelector('#pc-f').onsubmit = function (ev) {
-          ev.preventDefault();
+          ev.preventDefault(); ev.stopPropagation();   // que el manejador global de la app no lo tome como suyo
           var email = o.querySelector('#pc-e').value.trim(), pw = (o.querySelector('#pc-p') || {}).value, go = o.querySelector('.pc-b');
           go.disabled = true; msg('');
           client().then(function () {
             if (reset) return sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname }).then(function (r) { if (r.error) throw r.error; msg('Listo. Revisa tu correo.', 'o'); });
             if (reg) return sb.auth.signUp({ email: email, password: pw, options: { emailRedirectTo: location.origin + location.pathname } }).then(function (r) {
               if (r.error) throw r.error;
-              if (r.data.session) { close(); } else { msg('Te enviamos un correo. Toca el enlace para confirmar y luego ingresa.', 'o'); }
+              if (!r.data.session) { msg('Te enviamos un correo. Toca el enlace para confirmar y luego ingresa.', 'o'); }
             });
-            return sb.auth.signInWithPassword({ email: email, password: pw }).then(function (r) { if (r.error) throw r.error; close(); });
+            return sb.auth.signInWithPassword({ email: email, password: pw }).then(function (r) { if (r.error) throw r.error; });
           }).catch(function (e) { msg(friendly(e), 'e'); }).then(function () { go.disabled = false; });
         };
       });
@@ -189,12 +207,13 @@
       '<button class="pc-b alt" data-x>Cerrar</button>',
       function (o) {
         o.querySelector('[data-s]').onclick = function () { reconcile().then(function () { if (ov) accountSheet(); }); };
-        o.querySelector('[data-o]').onclick = function () { sb.auth.signOut().then(function () { setMark({}); close(); }); };
+        o.querySelector('[data-o]').onclick = function () { clearTimeout(pushTimer); pushTimer = null; pushNow().then(function () { return sb.auth.signOut(); }).then(function () { wipeLocal(); }); };
         o.querySelector('[data-x]').onclick = close;
       });
   }
 
   function paint() {
+    if (user) unlock();
     if (!btn) return;
     btn.classList.toggle('on', !!user);
     btn.setAttribute('aria-label', user ? 'Tu cuenta' : 'Ingresar');
@@ -208,8 +227,18 @@
     }).catch(function () { show('<h2>Sin conexión</h2><p>No se pudo cargar el inicio de sesión. Revisa tu internet.</p><button class="pc-b" data-x>Cerrar</button>', function (o) { o.querySelector('[data-x]').onclick = close; }); });
   });
 
-  /* Si ya había sesión guardada, reanudarla al abrir. */
-  client().then(function () { return sb.auth.getSession(); }).then(function (r) {
-    if (r.data.session && !user) { user = r.data.session.user; paint(); reconcile(); }
-  }).catch(function () {});
+  /* Compuerta: la app no se ve hasta ingresar. */
+  function boot() {
+    lock();
+    show('<h2>Cargando…</h2><p>Un momento.</p>');
+    client().then(function () { return sb.auth.getSession(); }).then(function (r) {
+      if (r.data.session) { if (!user) { user = r.data.session.user; paint(); reconcile(); } }
+      else authSheet('login');
+    }).catch(function () {
+      if (getMark().uid) { unlock(); return; }   // ya ingresó antes en este dispositivo: dejar usar sin internet
+      show('<h2>Sin conexión</h2><p>Necesitas internet para ingresar la primera vez.</p><button class="pc-b" data-r>Reintentar</button>',
+        function (o) { o.querySelector('[data-r]').onclick = boot; });
+    });
+  }
+  boot();
 })();
