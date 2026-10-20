@@ -1,0 +1,215 @@
+/* Plata Clara - cuenta y sincronización en la nube (Supabase).
+   Si config.js está vacío, esto no hace nada y la app funciona igual que antes (solo local). */
+(function () {
+  'use strict';
+  var C = window.PC_CONFIG || {};
+  if (!C.SUPABASE_URL || !C.SUPABASE_ANON_KEY) return;
+
+  var SYNC_KEY = 'plataclara.sync';
+  var sb = null, user = null, pushTimer = null, pushing = false, pending = false, status = 'idle', applying = false;
+  var btn = document.getElementById('b-account');
+  if (btn) btn.hidden = false;
+
+  function getMark() { try { return JSON.parse(localStorage.getItem(SYNC_KEY)) || {}; } catch (e) { return {}; } }
+  function setMark(o) { try { localStorage.setItem(SYNC_KEY, JSON.stringify(o)); } catch (e) {} }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function st() { return window.__pc && window.__pc.get(); }
+  function hasUserData(d) { return !!(d && !d.demo && ((d.moves && d.moves.length) || (d.goals && d.goals.length) || (d.debts && d.debts.length))); }
+
+  /* ---------- carga de la librería ---------- */
+  function loadLib() {
+    return new Promise(function (ok, fail) {
+      if (window.supabase) return ok();
+      var s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js';
+      s.onload = ok; s.onerror = function () { fail(new Error('lib')); };
+      document.head.appendChild(s);
+    });
+  }
+  function client() {
+    if (sb) return Promise.resolve(sb);
+    return loadLib().then(function () {
+      sb = window.supabase.createClient(C.SUPABASE_URL, C.SUPABASE_ANON_KEY, { auth: { persistSession: true, autoRefreshToken: true } });
+      sb.auth.onAuthStateChange(function (ev, session) {
+        var prev = user && user.id;
+        user = session ? session.user : null;
+        paint();
+        if (user && user.id !== prev && ev !== 'TOKEN_REFRESHED') reconcile();
+      });
+      return sb;
+    });
+  }
+
+  /* ---------- sincronización ---------- */
+  function setStatus(s) { status = s; paint(); }
+
+  function pushNow() {
+    if (!user || !sb) return Promise.resolve();
+    if (pushing) { pending = true; return Promise.resolve(); }
+    pushing = true; setStatus('saving');
+    var now = new Date().toISOString();
+    return sb.from('user_data').upsert({ user_id: user.id, data: st(), updated_at: now }).then(function (r) {
+      pushing = false;
+      if (r.error) { setStatus('error'); return; }
+      setMark({ uid: user.id, at: now });
+      setStatus('ok');
+      if (pending) { pending = false; schedulePush(); }
+    }, function () { pushing = false; setStatus('error'); });
+  }
+  function schedulePush() { clearTimeout(pushTimer); pushTimer = setTimeout(pushNow, 1500); }
+
+  /* La app llama a esto cada vez que guarda. */
+  window.__pcPush = function () { if (user && !applying) schedulePush(); };
+
+  function applyRemote(row) {
+    applying = true;
+    try { window.__pc.apply(row.data); } finally { applying = false; }
+    setMark({ uid: user.id, at: row.updated_at });
+    setStatus('ok');
+  }
+
+  function reconcile() {
+    if (!user) return Promise.resolve();
+    setStatus('saving');
+    return sb.from('user_data').select('data,updated_at').eq('user_id', user.id).maybeSingle().then(function (r) {
+      if (r.error) { setStatus('error'); return; }
+      var row = r.data, mark = getMark(), local = st();
+      if (!row) { return pushNow(); }                          // primera vez en la nube: subir lo de este dispositivo
+      if (mark.uid === user.id) {                              // este dispositivo ya se había sincronizado antes
+        if (row.updated_at > (mark.at || '')) return applyRemote(row);   // la nube es más nueva
+        return pushNow();                                      // lo local es igual o más nuevo
+      }
+      if (!hasUserData(local)) return applyRemote(row);        // dispositivo sin datos propios: bajar la nube
+      setStatus('ok'); chooseSheet(row);                       // ambos tienen datos: que decida la persona
+    }, function () { setStatus('error'); });
+  }
+
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden && user && !pushing && !pushTimer) reconcile();
+  });
+  window.addEventListener('online', function () { if (user) reconcile(); });
+
+  /* ---------- interfaz ---------- */
+  var ov = null;
+  function css() {
+    if (document.getElementById('pc-cloud-css')) return;
+    var s = document.createElement('style'); s.id = 'pc-cloud-css';
+    s.textContent =
+      '#pc-ov{position:fixed;inset:0;z-index:100;background:rgba(10,20,15,.5);display:flex;align-items:center;justify-content:center;padding:16px}' +
+      '#pc-ov .pc-card{background:var(--surface);color:var(--ink);border-radius:18px;box-shadow:var(--shadow);width:100%;max-width:400px;padding:22px;max-height:92vh;overflow:auto;font-family:var(--f-body)}' +
+      '#pc-ov h2{font-size:21px;margin:0 0 4px}#pc-ov p{color:var(--muted);margin:0 0 14px;font-size:14px}' +
+      '#pc-ov label{display:block;font-size:13px;font-weight:600;margin:10px 0 4px}' +
+      '#pc-ov input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface2);font-size:16px}' +
+      '#pc-ov .pc-b{display:block;width:100%;margin-top:14px;padding:12px;border:0;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-weight:600}' +
+      '#pc-ov .pc-b.alt{background:var(--surface2);color:var(--ink);border:1px solid var(--line)}#pc-ov .pc-b[disabled]{opacity:.6}' +
+      '#pc-ov .pc-l{background:none;border:0;color:var(--accent);padding:6px 0;margin-top:8px;font-size:14px;text-decoration:underline}' +
+      '#pc-ov .pc-m{margin-top:10px;font-size:14px;min-height:18px}#pc-ov .pc-m.e{color:var(--exp)}#pc-ov .pc-m.o{color:var(--inc)}' +
+      '#b-account.on{color:var(--accent)}';
+    document.head.appendChild(s);
+  }
+  function close() { if (ov) { ov.remove(); ov = null; } }
+  function show(html, bind) {
+    css(); close();
+    ov = document.createElement('div'); ov.id = 'pc-ov';
+    ov.innerHTML = '<div class="pc-card" role="dialog" aria-modal="true">' + html + '</div>';
+    ov.addEventListener('click', function (e) { if (e.target === ov) close(); });
+    document.body.appendChild(ov);
+    if (bind) bind(ov);
+    var f = ov.querySelector('input'); if (f) f.focus();
+  }
+  function msg(t, kind) { var m = ov && ov.querySelector('.pc-m'); if (m) { m.textContent = t; m.className = 'pc-m ' + (kind || ''); } }
+  function friendly(e) {
+    var m = (e && e.message || '').toLowerCase();
+    if (m.indexOf('invalid login') > -1) return 'Correo o contraseña incorrectos.';
+    if (m.indexOf('already registered') > -1) return 'Ese correo ya tiene cuenta. Ingresa con tu contraseña.';
+    if (m.indexOf('password') > -1 && m.indexOf('6') > -1) return 'La contraseña debe tener al menos 6 caracteres.';
+    if (m.indexOf('rate limit') > -1 || m.indexOf('too many') > -1) return 'Demasiados intentos. Espera unos minutos.';
+    if (m.indexOf('email not confirmed') > -1) return 'Confirma tu correo con el enlace que te enviamos y vuelve a ingresar.';
+    if (m.indexOf('fetch') > -1 || m.indexOf('network') > -1) return 'Sin conexión. Revisa tu internet.';
+    return 'No se pudo completar. Intenta de nuevo.';
+  }
+
+  function authSheet(mode) {
+    var reg = mode === 'register', reset = mode === 'reset';
+    show(
+      '<h2>' + (reset ? 'Recuperar contraseña' : reg ? 'Crear cuenta' : 'Ingresar') + '</h2>' +
+      '<p>' + (reset ? 'Te enviaremos un enlace a tu correo.' : 'Tus datos se guardan en la nube y los ves en todos tus dispositivos.') + '</p>' +
+      '<form id="pc-f"><label for="pc-e">Correo</label><input id="pc-e" type="email" autocomplete="email" required>' +
+      (reset ? '' : '<label for="pc-p">Contraseña</label><input id="pc-p" type="password" minlength="6" autocomplete="' + (reg ? 'new-password' : 'current-password') + '" required>') +
+      '<button class="pc-b" type="submit">' + (reset ? 'Enviar enlace' : reg ? 'Crear cuenta' : 'Ingresar') + '</button></form>' +
+      '<div class="pc-m" role="status"></div>' +
+      (reset ? '<button class="pc-l" data-m="login">Volver</button>' :
+        '<button class="pc-l" data-m="' + (reg ? 'login' : 'register') + '">' + (reg ? 'Ya tengo cuenta' : 'No tengo cuenta, crear una') + '</button>' +
+        (reg ? '' : '<br><button class="pc-l" data-m="reset">Olvidé mi contraseña</button>')) +
+      '<button class="pc-b alt" data-x>Seguir sin cuenta</button>',
+      function (o) {
+        o.querySelectorAll('[data-m]').forEach(function (b) { b.onclick = function () { authSheet(b.getAttribute('data-m')); }; });
+        o.querySelector('[data-x]').onclick = close;
+        o.querySelector('#pc-f').onsubmit = function (ev) {
+          ev.preventDefault();
+          var email = o.querySelector('#pc-e').value.trim(), pw = (o.querySelector('#pc-p') || {}).value, go = o.querySelector('.pc-b');
+          go.disabled = true; msg('');
+          client().then(function () {
+            if (reset) return sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname }).then(function (r) { if (r.error) throw r.error; msg('Listo. Revisa tu correo.', 'o'); });
+            if (reg) return sb.auth.signUp({ email: email, password: pw, options: { emailRedirectTo: location.origin + location.pathname } }).then(function (r) {
+              if (r.error) throw r.error;
+              if (r.data.session) { close(); } else { msg('Te enviamos un correo. Toca el enlace para confirmar y luego ingresa.', 'o'); }
+            });
+            return sb.auth.signInWithPassword({ email: email, password: pw }).then(function (r) { if (r.error) throw r.error; close(); });
+          }).catch(function (e) { msg(friendly(e), 'e'); }).then(function () { go.disabled = false; });
+        };
+      });
+  }
+
+  function chooseSheet(row) {
+    var cnt = function (d) { return ((d.moves || []).length) + ' movimientos'; };
+    show(
+      '<h2>Ya tienes datos en la nube</h2>' +
+      '<p>Este dispositivo también tiene datos (' + cnt(st()) + '). La nube tiene ' + cnt(row.data) + '. ¿Cuáles quieres conservar?</p>' +
+      '<button class="pc-b" data-c="cloud">Usar los de la nube</button>' +
+      '<button class="pc-b alt" data-c="local">Subir los de este dispositivo</button>' +
+      '<div class="pc-m">Lo que no elijas se reemplaza. Si dudas, usa los de la nube.</div>',
+      function (o) {
+        o.querySelectorAll('[data-c]').forEach(function (b) {
+          b.onclick = function () {
+            var c = b.getAttribute('data-c'); close();
+            if (c === 'cloud') applyRemote(row); else pushNow();
+          };
+        });
+      });
+  }
+
+  function accountSheet() {
+    var label = { saving: 'Guardando…', ok: 'Todo guardado en la nube', error: 'No se pudo guardar. Se reintentará al guardar de nuevo.', idle: '' }[status];
+    show(
+      '<h2>Tu cuenta</h2><p>' + esc(user.email) + '</p>' +
+      '<div class="pc-m ' + (status === 'error' ? 'e' : 'o') + '">' + label + '</div>' +
+      '<button class="pc-b alt" data-s>Sincronizar ahora</button>' +
+      '<button class="pc-b alt" data-o>Cerrar sesión</button>' +
+      '<button class="pc-b alt" data-x>Cerrar</button>',
+      function (o) {
+        o.querySelector('[data-s]').onclick = function () { reconcile().then(function () { if (ov) accountSheet(); }); };
+        o.querySelector('[data-o]').onclick = function () { sb.auth.signOut().then(function () { setMark({}); close(); }); };
+        o.querySelector('[data-x]').onclick = close;
+      });
+  }
+
+  function paint() {
+    if (!btn) return;
+    btn.classList.toggle('on', !!user);
+    btn.setAttribute('aria-label', user ? 'Tu cuenta' : 'Ingresar');
+    btn.title = user ? (status === 'error' ? 'Error al sincronizar' : 'Sincronizado') : 'Ingresar';
+  }
+
+  if (btn) btn.addEventListener('click', function () {
+    client().then(function () { return sb.auth.getSession(); }).then(function (r) {
+      user = r.data.session ? r.data.session.user : null;
+      if (user) accountSheet(); else authSheet('login');
+    }).catch(function () { show('<h2>Sin conexión</h2><p>No se pudo cargar el inicio de sesión. Revisa tu internet.</p><button class="pc-b" data-x>Cerrar</button>', function (o) { o.querySelector('[data-x]').onclick = close; }); });
+  });
+
+  /* Si ya había sesión guardada, reanudarla al abrir. */
+  client().then(function () { return sb.auth.getSession(); }).then(function (r) {
+    if (r.data.session && !user) { user = r.data.session.user; paint(); reconcile(); }
+  }).catch(function () {});
+})();

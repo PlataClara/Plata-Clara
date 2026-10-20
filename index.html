@@ -202,6 +202,7 @@ label.f>*:not(span){color:var(--ink);font-weight:400}
       <h1 id="title">Resumen</h1>
       <div style="display:flex;gap:8px">
         <button class="icon-btn" id="b-tour" data-a="tour" aria-label="Ver el tutorial" style="font-weight:700;font-family:var(--f-display);font-size:18px">?</button>
+        <button class="icon-btn" id="b-account" aria-label="Ingresar" hidden><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
         <button class="icon-btn" id="b-region" data-a="region" aria-label="Idioma y moneda"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></button>
         <button class="icon-btn" id="b-settings" data-a="settings" aria-label="Ajustes"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg></button>
       </div>
@@ -391,7 +392,7 @@ function reseedDemo(){
 
 var mem=null;
 function load(){try{var s=localStorage.getItem(KEY);if(s){var d=JSON.parse(s);if(d&&d.moves)return d;}}catch(e){}return mem;}
-function save(){mem=S;try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function save(){mem=S;try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}try{if(window.__pcPush)window.__pcPush();}catch(e){}}
 var S=load();
 if(S){
   LANG=validLang(S.lang)?S.lang:detectLang();
@@ -832,9 +833,19 @@ document.addEventListener('submit',function(e){
   save();ui.sheet=null;render();if(msg)toast(msg);
 });
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ui.sheet)closeSheet();});
+window.__pc={get:function(){return S;},apply:function(d){
+  if(!d||!d.moves)return;
+  S=d;LANG=validLang(S.lang)?S.lang:LANG;S.lang=LANG;
+  if(!validCur(S.cc))S.cc=detectCC(LANG);
+  if(!S.quicks)S.quicks=[];
+  nfc={};mem=S;try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}
+  ui.sheet=null;render();
+}};
 render();
 })();
 </script>
+<script src="config.js"></script>
+<script src="cloud.js"></script>
 <script>
 /* Actualización automática: registra el service worker y recarga cuando hay versión nueva */
 (function(){
