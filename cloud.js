@@ -43,7 +43,7 @@
         user = session ? session.user : null;
         if (!user && ev === 'SIGNED_OUT') { lock(); authSheet('login'); }
         paint();
-        if (user && user.id !== prev && ev !== 'TOKEN_REFRESHED') reconcile();
+        if (user && user.id !== prev && ev !== 'TOKEN_REFRESHED') { reconcile(); refreshPushTz(); }
       });
       return sb;
     });
@@ -97,6 +97,55 @@
     if (!document.hidden && user && !pushing && !pushTimer) reconcile();
   });
   window.addEventListener('online', function () { if (user) reconcile(); });
+
+  /* ---------- avisos de cuotas (notificaciones push) ---------- */
+  var VAPID = C.VAPID_PUBLIC_KEY || '';
+  var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  var standalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+  function pushSupported() { return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window; }
+  function b64ToU8(s) {
+    var p = '='.repeat((4 - s.length % 4) % 4), b = (s + p).replace(/-/g, '+').replace(/_/g, '/'), r = atob(b), o = new Uint8Array(r.length);
+    for (var i = 0; i < r.length; i++) o[i] = r.charCodeAt(i);
+    return o;
+  }
+  function myTz() { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Lima'; } catch (e) { return 'America/Lima'; } }
+  function currentSub() {
+    if (!pushSupported()) return Promise.resolve(null);
+    return navigator.serviceWorker.ready.then(function (reg) { return reg.pushManager.getSubscription(); }).catch(function () { return null; });
+  }
+  function enablePush() {
+    return Notification.requestPermission().then(function (p) {
+      if (p !== 'granted') throw new Error('denied');
+      return navigator.serviceWorker.ready;
+    }).then(function (reg) {
+      return reg.pushManager.getSubscription().then(function (s) {
+        return s || reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToU8(VAPID) });
+      });
+    }).then(function (sub) {
+      var j = sub.toJSON();
+      return sb.from('push_subscriptions').upsert({ user_id: user.id, endpoint: j.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth, tz: myTz() }, { onConflict: 'endpoint' });
+    }).then(function (r) { if (r.error) throw r.error; });
+  }
+  function disablePush() {
+    return currentSub().then(function (s) {
+      if (!s) return;
+      return sb.from('push_subscriptions').delete().eq('endpoint', s.endpoint).then(function () { return s.unsubscribe(); });
+    });
+  }
+  /* Si viajas o cambias de zona horaria, el aviso de las 10:00 sigue la hora de tu dispositivo. */
+  function refreshPushTz() {
+    if (!VAPID || !user || !pushSupported() || Notification.permission !== 'granted') return;
+    currentSub().then(function (s) {
+      if (!s) return;
+      var j = s.toJSON();
+      return sb.from('push_subscriptions').upsert({ user_id: user.id, endpoint: j.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth, tz: myTz() }, { onConflict: 'endpoint' });
+    }).catch(function () {});
+  }
+  function testPush() {
+    return navigator.serviceWorker.ready.then(function (reg) {
+      return reg.showNotification('Plata Clara', { body: 'Así te avisaremos: “Mañana vence tu cuota”.', icon: 'icon-192.png', tag: 'prueba', data: { url: './#deudas' } });
+    });
+  }
 
   /* ---------- interfaz ---------- */
   var ov = null;
@@ -197,19 +246,58 @@
       });
   }
 
+  function pushBlock(sub) {
+    if (!VAPID) return '';
+    var h = '<h3 style="font-size:16px;margin:18px 0 4px">Avisos de cuotas</h3>';
+    h += '<p style="margin:0 0 8px">Te avisamos al celular 1 día antes y el mismo día de cada cuota, a las 10:00 a. m.</p>';
+    if (!pushSupported() || (isIOS && !standalone)) {
+      h += '<div class="pc-m">' + (isIOS && !standalone
+        ? 'En iPhone, primero agrega la app a tu pantalla de inicio (Compartir → “Agregar a pantalla de inicio”) y ábrela desde ese ícono. Luego vuelve aquí para activar los avisos.'
+        : 'Este navegador no permite avisos. Prueba con Chrome en Android o instala la app en tu pantalla de inicio.') + '</div>';
+    } else if (Notification.permission === 'denied') {
+      h += '<div class="pc-m e">Los avisos están bloqueados en este dispositivo. Actívalos en los ajustes del navegador o de la app y vuelve aquí.</div>';
+    } else if (sub && Notification.permission === 'granted') {
+      h += '<div class="pc-m o">Avisos activados en este dispositivo.</div>' +
+        '<button class="pc-b alt" data-pt>Probar aviso</button><button class="pc-b alt" data-pd>Desactivar avisos</button>';
+    } else {
+      h += '<button class="pc-b" data-pe>Activar avisos en este dispositivo</button><div class="pc-m" data-pm></div>';
+    }
+    return h;
+  }
+
   function accountSheet() {
     var label = { saving: 'Guardando…', ok: 'Todo guardado en la nube', error: 'No se pudo guardar. Se reintentará al guardar de nuevo.', idle: '' }[status];
-    show(
-      '<h2>Tu cuenta</h2><p>' + esc(user.email) + '</p>' +
-      '<div class="pc-m ' + (status === 'error' ? 'e' : 'o') + '">' + label + '</div>' +
-      '<button class="pc-b alt" data-s>Sincronizar ahora</button>' +
-      '<button class="pc-b alt" data-o>Cerrar sesión</button>' +
-      '<button class="pc-b alt" data-x>Cerrar</button>',
-      function (o) {
-        o.querySelector('[data-s]').onclick = function () { reconcile().then(function () { if (ov) accountSheet(); }); };
-        o.querySelector('[data-o]').onclick = function () { clearTimeout(pushTimer); pushTimer = null; pushNow().then(function () { return sb.auth.signOut(); }).then(function () { wipeLocal(); }); };
-        o.querySelector('[data-x]').onclick = close;
-      });
+    currentSub().then(function (sub) {
+      show(
+        '<h2>Tu cuenta</h2><p>' + esc(user.email) + '</p>' +
+        '<div class="pc-m ' + (status === 'error' ? 'e' : 'o') + '">' + label + '</div>' +
+        '<button class="pc-b alt" data-s>Sincronizar ahora</button>' +
+        pushBlock(sub) +
+        '<button class="pc-b alt" data-o>Cerrar sesión</button>' +
+        '<button class="pc-b alt" data-x>Cerrar</button>',
+        function (o) {
+          o.querySelector('[data-s]').onclick = function () { reconcile().then(function () { if (ov) accountSheet(); }); };
+          o.querySelector('[data-o]').onclick = function () {
+            clearTimeout(pushTimer); pushTimer = null;
+            Promise.resolve(disablePush()).catch(function () {})            // este dispositivo deja de recibir avisos de esta cuenta
+              .then(function () { return pushNow(); })
+              .then(function () { return sb.auth.signOut(); })
+              .then(function () { wipeLocal(); });
+          };
+          o.querySelector('[data-x]').onclick = close;
+          var pe = o.querySelector('[data-pe]'), pd = o.querySelector('[data-pd]'), pt = o.querySelector('[data-pt]');
+          if (pe) pe.onclick = function () {
+            pe.disabled = true;
+            enablePush().then(function () { accountSheet(); }).catch(function (e) {
+              pe.disabled = false;
+              var m = o.querySelector('[data-pm]');
+              if (m) { m.className = 'pc-m e'; m.textContent = (e && e.message === 'denied') ? 'No diste permiso. Pulsa de nuevo y elige “Permitir”.' : 'No se pudieron activar los avisos. Intenta de nuevo.'; }
+            });
+          };
+          if (pd) pd.onclick = function () { pd.disabled = true; disablePush().then(function () { accountSheet(); }, function () { accountSheet(); }); };
+          if (pt) pt.onclick = function () { testPush(); };
+        });
+    });
   }
 
   function paint() {

@@ -1,6 +1,6 @@
 // Plata Clara - service worker
 // Estrategia: red primero (siempre intenta bajar lo último), caché solo si no hay internet.
-const CACHE = 'plata-clara-v3';
+const CACHE = 'plata-clara-v4';
 const BASE = ['./', 'index.html', 'config.js', 'cloud.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 
 self.addEventListener('install', function (e) {
@@ -35,4 +35,31 @@ self.addEventListener('fetch', function (e) {
         return caches.match(req).then(function (hit) { return hit || caches.match('index.html'); });
       })
   );
+});
+
+// ---- Avisos de cuotas (notificaciones push) ----
+self.addEventListener('push', function (e) {
+  var d = {};
+  try { d = e.data ? e.data.json() : {}; } catch (err) { d = { body: e.data ? e.data.text() : '' }; }
+  e.waitUntil(self.registration.showNotification(d.title || 'Plata Clara', {
+    body: d.body || '',
+    icon: 'icon-192.png',
+    tag: d.tag || 'plata-clara',
+    renotify: true,
+    data: { url: d.url || './#deudas' }
+  }));
+});
+
+self.addEventListener('notificationclick', function (e) {
+  e.notification.close();
+  var url = new URL((e.notification.data && e.notification.data.url) || './#deudas', self.location).href;
+  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (list) {
+    for (var i = 0; i < list.length; i++) {
+      var c = list[i];
+      if (c.url.split('#')[0] === url.split('#')[0] && 'focus' in c) {
+        return c.focus().then(function (w) { try { return w.navigate(url); } catch (err) {} });
+      }
+    }
+    return self.clients.openWindow(url);
+  }));
 });
