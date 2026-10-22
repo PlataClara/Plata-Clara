@@ -266,6 +266,12 @@ fr:{"Mi cuenta":"Mon compte","¿Descontar de tus ingresos?":"Déduire de vos rev
 de:{"Mi cuenta":"Mein Konto","¿Descontar de tus ingresos?":"Von deinen Einnahmen abziehen?","Sí, descontar de mi Disponible":"Ja, von Verfügbar abziehen","No afecta mi Disponible":"Wirkt sich nicht auf Verfügbar aus"},
 it:{"Mi cuenta":"Il mio account","¿Descontar de tus ingresos?":"Detrarre dalle tue entrate?","Sí, descontar de mi Disponible":"Sì, detrai dal mio Disponibile","No afecta mi Disponible":"Non incide sul mio Disponibile"}};
 Object.keys(N).forEach(function(l){DICT[l]=DICT[l]||{};for(var k in N[l])DICT[l][k]=N[l][k];});})();
+(function(){var N={en:{"¿De dónde sale este pago?":"Where does this payment come from?","De mis ahorros":"From my savings"},
+pt:{"¿De dónde sale este pago?":"De onde sai este pagamento?","De mis ahorros":"Das minhas poupanças"},
+fr:{"¿De dónde sale este pago?":"D’où vient ce paiement ?","De mis ahorros":"De mon épargne"},
+de:{"¿De dónde sale este pago?":"Woher stammt diese Zahlung?","De mis ahorros":"Aus meinen Ersparnissen"},
+it:{"¿De dónde sale este pago?":"Da dove arriva questo pagamento?","De mis ahorros":"Dai miei risparmi"}};
+Object.keys(N).forEach(function(l){DICT[l]=DICT[l]||{};for(var k in N[l])DICT[l][k]=N[l][k];});})();
 function K(s){return s;}                    /* marca textos estáticos que se traducen al mostrarlos */
 var LANG='es';
 function t(k,v){
@@ -529,6 +535,7 @@ function inMonth(m,k){return m.date.slice(0,7)===k;}
 function sum(k,type){return S.moves.reduce(function(a,m){return a+(m.type===type&&(k==null||inMonth(m,k))&&!(m.prior&&k!=null)?toBase(m):0);},0);}
 function spentByCat(k){var o={};S.moves.forEach(function(m){if(m.type==='Gasto'&&!m.prior&&inMonth(m,k))o[m.cat]=(o[m.cat]||0)+toBase(m);});return o;}
 function goalSaved(g){return g.initial+S.moves.reduce(function(a,m){return a+(m.goalId===g.id?toBase(m):0);},0);}
+function savOut(){return S.moves.reduce(function(a,m){return a+(m.fromSav?toBase(m):0);},0);}
 function debtPaid(d){return d.initial+S.moves.reduce(function(a,m){return a+(m.debtId===d.id?toBase(m):0);},0);}
 function niceMax(v){if(v<=0)return 100;var e=Math.pow(10,Math.floor(Math.log10(v))),f=v/e;var n=f<=1?1:f<=2?2:f<=4?4:f<=8?8:10;return n*e;}
 
@@ -587,6 +594,7 @@ function sanitize(raw){
     if(m.goalId)r.goalId=cleanId(m.goalId);
     if(m.debtId)r.debtId=cleanId(m.debtId);
     if(m.prior)r.prior=true;
+    if(m.fromSav)r.fromSav=true;
     if(m.cc&&validCur(m.cc)&&m.cc!==(validCur(o.cc)?o.cc:S.cc)){r.cc=m.cc;if(Number(m.fx)>0&&validCur(m.fxb)){r.fx=Number(m.fx);r.fxb=m.fxb;}}
     return r;
   });
@@ -668,7 +676,7 @@ function vResumen(){
     +statTile(t('Disponible'),money(libre),t('Después de gastos, ahorro y deudas'),libre<0?'c-exp':'',true)
     +statTile(t('Ingresos'),money(inc),t('Lo que entró este mes'),'c-inc')
     +statTile(t('Gastos'),money(gas),inc?t('{p}% de tus ingresos',{p:Math.round(gas/inc*100)}):t('Sin ingresos aún'),'c-exp')
-    +statTile(t('Ahorrado este mes'),money(ah),t('Total acumulado: {v}',{v:money(sum(null,'Ahorro'))}),'c-sav')+'</div>';
+    +statTile(t('Ahorrado este mes'),money(ah),t('Total acumulado: {v}',{v:money(sum(null,'Ahorro')-savOut())}),'c-sav')+'</div>';
   h+='<div class="grid two" style="margin-top:12px"><section class="card"><h2>'+t('Ingresos y gastos')+' <small>'+t('últimos 6 meses')+'</small></h2><div class="legend"><span class="li">'+t('Ingresos')+'</span><span class="le">'+t('Gastos')+'</span></div>'+chart()+'</section>';
   var sp=spentByCat(k),cats=Object.keys(sp).sort(function(a,b){return sp[b]-sp[a];}),top=cats.length?sp[cats[0]]:1;
   h+='<section class="card"><h2>'+t('Gasto por categoría')+' <small>'+monthLabel(k)+'</small></h2>';
@@ -688,7 +696,7 @@ function moveRow(m){
   var sign=m.type==='Ingreso'?'+':m.type==='Gasto'?'−':'';
   var sub=m.type==='Ahorro'||m.type==='Deuda'?t(TYPE_LABEL[m.type]):cname(m.cat);
   if(m.goalId){var g=S.goals.filter(function(x){return x.id===m.goalId;})[0];if(g)sub+=' · '+g.name;}
-  if(m.prior)sub+=' · '+t(m.type==='Ahorro'?'Ya lo tenía ahorrado':'No afecta mi Disponible');
+  if(m.fromSav)sub+=' · '+t('De mis ahorros');else if(m.prior)sub+=' · '+t(m.type==='Ahorro'?'Ya lo tenía ahorrado':'No afecta mi Disponible');
   var fgn=m.cc&&m.cc!==S.cc;
   if(fgn)sub+=' · ≈ '+money(toBase(m));
   if(m.debtId){var d=S.debts.filter(function(x){return x.id===m.debtId;})[0];if(d)sub+=' · '+d.name;}
@@ -720,7 +728,7 @@ function vPresu(){
   return h+'</section>';
 }
 function vAhorros(){
-  var tot=sum(null,'Ahorro'),inG=S.moves.reduce(function(a,m){return a+(m.type==='Ahorro'&&m.goalId?toBase(m):0);},0);
+  var tot=sum(null,'Ahorro')-savOut(),inG=S.moves.reduce(function(a,m){return a+(m.type==='Ahorro'&&m.goalId?toBase(m):0);},0);
   var h='<div class="toolbar"><div><span class="stat"><span class="k">'+t('Total ahorrado')+'</span><span class="v num c-sav" style="font-size:28px">'+money(tot)+'</span></span></div><button class="btn" data-a="save-new">'+t('Nuevo ahorro')+'</button></div>';
   h+='<div class="grid stats" style="grid-template-columns:repeat(2,minmax(0,1fr))">'
     +statTile(t('En metas'),money(inG),t('Aportes a tus metas'),'c-sav')
@@ -762,25 +770,28 @@ function vDeudas(){
   h+='<div class="cards">';
   S.debts.forEach(function(d){
     var paid=debtPaid(d),left=Math.max(0,d.total-paid),pct=Math.min(100,d.total?paid/d.total*100:0);
-    var months=d.monthly?Math.ceil(left/d.monthly):null;
+    var months=d.monthly?Math.ceil(left/d.monthly):null,iM=dueInfo(d),paidM=!!(iM&&iM.paid),done=left===0||paidM;
     var meta=d.monthly?t('Cuota de {v}',{v:money(d.monthly)})+(d.day?' · '+t('día {d} de cada mes',{d:d.day}):''):t('Sin cuota fija');
     if(months&&left)meta+=' · '+t('faltan ~{n} cuotas',{n:months});
-    h+='<article class="card item"><h3>'+esc(d.name)+(left===0?'<span class="tag c-inc">'+t('Pagada')+'</span>':'')+'</h3><p class="meta">'+meta+'</p>'
+    h+='<article class="card item"><h3>'+esc(d.name)+(left===0?'<span class="tag c-inc">'+t('Pagada')+'</span>':paidM?'<span class="tag c-inc">'+t('Pagado')+'</span>':'')+'</h3><p class="meta">'+meta+'</p>'
      +debtStatusHTML(d,left)+'<div class="track"><div class="fill dbt" style="width:'+pct+'%"></div></div><div class="figs"><span>'+t('Pagado')+'<br><b class="num">'+money(paid)+'</b></span><span style="text-align:right">'+t('Falta')+'<br><b class="num c-debt">'+money(left)+'</b></span></div>'
-     +'<div class="actions"><button class="btn sm" data-a="pay" data-id="'+d.id+'"'+(left===0?' disabled':'')+'>'+t('Registrar pago')+'</button><button class="btn sm alt" data-a="debt-edit" data-id="'+d.id+'">'+t('Editar')+'</button></div></article>';
+     +(done?'':'<div class="actions"><button class="btn sm" data-a="pay" data-id="'+d.id+'">'+t('Registrar pago')+'</button><button class="btn sm alt" data-a="debt-edit" data-id="'+d.id+'">'+t('Editar')+'</button></div>')+'</article>';
   });
   return h+'</div>';
 }
 
 /* ================= hojas (formularios) ================= */
 function opts(list,sel,blank){return (blank?'<option value="">'+esc(blank)+'</option>':'')+list.map(function(o){var v=typeof o==='string'?o:o.id,l=typeof o==='string'?cname(o):o.name;return '<option value="'+esc(v)+'"'+(v===sel?' selected':'')+'>'+esc(l)+'</option>';}).join('');}
+function debtOrigin(m,id){
+  return '<label class="f full"><span>'+t('¿De dónde sale este pago?')+'</span><select id="'+(id||'f-origin')+'" name="origin"><option value="">'+t('De mis ingresos de este mes')+'</option><option value="ahorro"'+(m&&m.fromSav?' selected':'')+'>'+t('De mis ahorros')+'</option></select></label>';
+}
 function originSel(m,sav){
   return '<label class="f full"><span>'+t(sav?'¿De dónde viene este ahorro?':'¿Descontar de tus ingresos?')+'</span><select id="f-origin" name="origin"><option value="">'+t(sav?'De mis ingresos de este mes':'Sí, descontar de mi Disponible')+'</option><option value="prior"'+(m.prior?' selected':'')+'>'+t(sav?'Ya lo tenía ahorrado (no afecta este mes)':'No afecta mi Disponible')+'</option></select></label>';
 }
 function moveFields(type,m){
   m=m||{};
   if(type==='Ahorro')return originSel(m,true)+'<label class="f full"><span>'+t('Meta (opcional)')+'</span><select id="f-goal" name="goalId">'+opts(S.goals,m.goalId,t('Ahorro general'))+'</select></label>';
-  if(type==='Deuda')return originSel(m,false)+'<label class="f full"><span>'+t('Deuda')+'</span><select id="f-debt" name="debtId">'+opts(S.debts,m.debtId,t('Otra deuda'))+'</select></label>';
+  if(type==='Deuda')return debtOrigin(m)+'<label class="f full"><span>'+t('Deuda')+'</span><select id="f-debt" name="debtId">'+opts(S.debts,m.debtId,t('Otra deuda'))+'</select></label>';
   return (type==='Gasto'?originSel(m,false):'')+'<label class="f full"><span>'+t('Categoría')+'</span><select id="f-cat" name="cat">'+opts(CATS,m.cat||'Alimentación')+'</select></label>'
     +(m.id?'':'<label class="f full" style="flex-direction:row;align-items:center;gap:8px"><input id="f-asquick" type="checkbox" name="asquick" style="width:auto"><span>'+t('Guardar como atajo para anotarlo con un toque')+'</span></label>');
 }
@@ -844,7 +855,7 @@ function sheetHTML(){
     var dflt=isG?'':(ent.monthly||'');
     h='<h2>'+t(isG?K('Aportar a “{name}”'):K('Pago de “{name}”'),{name:esc(ent.name)})+'</h2><form data-kind="quick"><div class="fgrid"><label class="f"><span data-amtl>'+t('Monto ({c})',{c:sym})+'</span><input id="q-amt" name="amount" inputmode="decimal" required value="'+dflt+'"></label>'
       +'<label class="f"><span>'+t('Fecha')+'</span><input id="q-date" type="date" name="date" required value="'+iso(new Date())+'"></label>'+ccField()+'</div>'
-      +'<label class="f" style="margin-top:12px"><span>'+t(isG?'¿De dónde viene?':'¿Descontar de tus ingresos?')+'</span><select id="q-origin" name="origin"><option value="">'+t(isG?'De mis ingresos de este mes':'Sí, descontar de mi Disponible')+'</option><option value="prior">'+t(isG?'Ya lo tenía ahorrado':'No afecta mi Disponible')+'</option></select></label>'
+      +(isG?'<label class="f" style="margin-top:12px"><span>'+t('¿De dónde viene?')+'</span><select id="q-origin" name="origin"><option value="">'+t('De mis ingresos de este mes')+'</option><option value="prior">'+t('Ya lo tenía ahorrado')+'</option></select></label>':'<div style="margin-top:12px">'+debtOrigin(null,'q-origin')+'</div>')
       +'<p class="note">'+t(isG?K('Se guarda también como movimiento de ahorro.'):K('Se guarda también como movimiento de pago de deuda.'))+'</p><div class="foot"><button class="btn grow" type="submit">'+t('Guardar')+'</button><button class="btn alt" type="button" data-a="close">'+t('Cancelar')+'</button></div></form>';
   }else if(s.kind==='quicks'){
     h='<h2>'+t('Atajos')+'</h2><p class="note" style="margin:-6px 0 12px">'+t('Un atajo anota un gasto o ingreso frecuente con un solo toque, con la fecha de hoy.')+'</p>';
@@ -969,6 +980,7 @@ document.addEventListener('submit',function(e){
     var rec={id:s.id||uid(),date:d.date,type:d.type,desc:(d.desc||'').trim(),amount:Math.round(amt*100)/100,note:(d.note||'').trim(),cat:d.type==='Gasto'||d.type==='Ingreso'?(d.cat||'Otro'):''};
     if(d.type==='Ahorro'&&d.goalId)rec.goalId=d.goalId;
     if((d.type==='Ahorro'||d.type==='Gasto'||d.type==='Deuda')&&d.origin==='prior')rec.prior=true;
+    if(d.type==='Deuda'&&d.origin==='ahorro'){rec.prior=true;rec.fromSav=true;}
     if(d.type==='Deuda'&&d.debtId)rec.debtId=d.debtId;
     var prevM=s.id?S.moves.filter(function(m){return m.id===s.id;})[0]:null;
     stampFx(rec,d.cc,prevM);
@@ -993,6 +1005,7 @@ document.addEventListener('submit',function(e){
     var mv2={id:uid(),date:d.date,type:isG?'Ahorro':'Deuda',cat:'',desc:t(isG?K('Aporte a {name}'):K('Pago de {name}'),{name:ent.name}),amount:Math.round(qm*100)/100,note:''};
     if(isG)mv2.goalId=ent.id;else mv2.debtId=ent.id;
     if(d.origin==='prior')mv2.prior=true;
+    if(!isG&&d.origin==='ahorro'){mv2.prior=true;mv2.fromSav=true;}
     stampFx(mv2,d.cc,null);S.moves.push(mv2);msg=t(isG?K('Aporte registrado'):K('Pago registrado'));
   }
   save();ui.sheet=null;render();if(msg)toast(msg);
