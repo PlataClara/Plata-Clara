@@ -5,7 +5,7 @@
   var C = window.PC_CONFIG || {};
   if (!C.SUPABASE_URL || !C.SUPABASE_ANON_KEY) return;
 
-  var SYNC_KEY = 'plataclara.sync';
+  var SYNC_KEY = 'plataclara.sync', consentOK = false;
   var sb = null, user = null, pushTimer = null, pushing = false, pending = false, status = 'idle', applying = false;
   var btn = document.getElementById('b-account');
   if (btn) btn.hidden = false;
@@ -41,9 +41,10 @@
       sb.auth.onAuthStateChange(function (ev, session) {
         var prev = user && user.id;
         user = session ? session.user : null;
+        if (!user) consentOK = false;
         if (!user && ev === 'SIGNED_OUT') { lock(); authSheet('login'); }
         paint();
-        if (user && user.id !== prev && ev !== 'TOKEN_REFRESHED') { reconcile(); refreshPushTz(); }
+        if (user && user.id !== prev && ev !== 'TOKEN_REFRESHED') { checkConsent().then(function (ok) { if (ok) { paint(); reconcile(); refreshPushTz(); } }); }
       });
       return sb;
     });
@@ -149,7 +150,7 @@
   }
   function testPush() {
     return navigator.serviceWorker.ready.then(function (reg) {
-      return reg.showNotification('Plata Clara', { body: 'Así te avisaremos: “Mañana vence tu cuota”.', icon: 'icon-192.png', tag: 'prueba', data: { url: './#deudas' } });
+      return reg.showNotification('Plata Clara', { body: 'Así te avisaremos: “Mañana vence tu cuota”.', icon: 'icon-192.png', badge: 'badge.png', vibrate: [250, 120, 250, 120, 500], tag: 'prueba', data: { url: './#deudas' } });
     });
   }
 
@@ -219,13 +220,14 @@
       '#pc-ov.gate .pc-card{margin-bottom:auto;--surface:#fff;--surface2:#F3F8F5;--ink:#12201A;--muted:#566860;--line:#D3DED8;--accent:#0E6B50;--accent-ink:#fff;border-radius:24px;box-shadow:0 24px 60px rgba(0,0,0,.35);padding:24px}' +
       '#pc-ov.gate .pc-b{background:linear-gradient(135deg,#0E6B50,#12A37A);box-shadow:0 8px 18px rgba(14,107,80,.35)}' +
       '#pc-ov.gate input:focus{outline:2px solid #12A37A;border-color:#12A37A}' +
-      '#b-account.on{color:var(--accent)}';
+      '#b-account.on{color:var(--accent)}' +
+      '#pc-ov select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface2);color:var(--ink);font-size:16px}';
     document.head.appendChild(s);
   }
   function close() { if (ov) { ov.remove(); ov = null; } }
-  function show(html, bind) {
+  function show(html, bind, sticky) {
     css(); close();
-    var gate = !user;
+    var gate = !user || !!sticky;
     ov = document.createElement('div'); ov.id = 'pc-ov'; if (gate) ov.className = 'gate';
     ov.innerHTML = (gate ? '<div class="pc-hero"><div class="pc-logo">S/</div><div class="pc-name">Plata Clara</div><div class="pc-tag">Tus finanzas, claras y en orden</div></div>' : '') +
       '<div class="pc-card" role="dialog" aria-modal="true">' + html + '</div>';
@@ -246,13 +248,115 @@
     return 'No se pudo completar. Intenta de nuevo.';
   }
 
+  function age(s) {
+    var p = String(s || '').split('-'); if (p.length !== 3) return null;
+    var n = new Date(), a = n.getFullYear() - (+p[0]), m = n.getMonth() + 1 - (+p[1]);
+    if (m < 0 || (m === 0 && n.getDate() < (+p[2]))) a--;
+    return isFinite(a) ? a : null;
+  }
+  var MAILRE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  function maskMail(e) { var p = String(e || '').split('@'); return p.length === 2 ? p[0].slice(0, 2) + '***@' + p[1] : ''; }
+  function callConsent(body, jwt) {
+    return fetch(C.SUPABASE_URL + '/functions/v1/parent-consent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', apikey: C.SUPABASE_ANON_KEY, Authorization: 'Bearer ' + (jwt || C.SUPABASE_ANON_KEY) },
+      body: JSON.stringify(body)
+    }).then(function (r) { return r.json(); });
+  }
+
+  /* ---------- permiso de padres (menores de 14) ---------- */
+  function checkConsent(silent) {
+    if (!user || !sb) return Promise.resolve(false);
+    return sb.from('profiles').select('consent_status,parent_email,consent_sent_at').eq('user_id', user.id).maybeSingle().then(function (r) {
+      if (r.error) {
+        var code = String(r.error.code || '') + String(r.error.message || '');
+        if (/PGRST205|42P01|does not exist/.test(code) || getMark().uid === user.id) { consentOK = true; return true; }
+        if (!silent) waitSheet('error');
+        return false;
+      }
+      var p = r.data, s = p && p.consent_status;
+      if (s === 'pending' || s === 'rejected') {
+        consentOK = false;
+        if (!silent) {
+          if (s === 'pending' && !p.consent_sent_at) {
+            sb.auth.getSession().then(function (x) { return callConsent({ action: 'request' }, x.data.session && x.data.session.access_token); }).catch(function () {});
+          }
+          waitSheet(s, p);
+        }
+        return false;
+      }
+      consentOK = true; return true;     // adulto/14+, aprobado o cuenta anterior sin perfil
+    }, function () { return false; });
+  }
+  function waitSheet(s, p) {
+    lock();
+    var out = function (o) {
+      var b = o.querySelector('[data-o]');
+      if (b) b.onclick = function () { consentOK = false; sb.auth.signOut().then(function () { wipeLocal(); }); };
+    };
+    if (s === 'rejected') {
+      show('<h2>No autorizado</h2><p>Tu mamá, papá o tutor no autorizó el uso de la app, así que no puedes entrar.</p><button class="pc-b alt" data-o>Cerrar sesión</button>', out, true);
+      return;
+    }
+    if (s === 'error') {
+      show('<h2>No se pudo verificar</h2><p>Revisa tu internet e inténtalo de nuevo.</p><div class="pc-m"></div><button class="pc-b" data-r>Reintentar</button><button class="pc-l" data-o>Cerrar sesión</button>', function (o) {
+        out(o); o.querySelector('[data-r]').onclick = function () { checkConsent().then(function (ok) { if (ok) { paint(); reconcile(); } }); };
+      }, true);
+      return;
+    }
+    show('<h2>Falta el permiso de tus padres</h2><p>Enviamos un aviso a <b>' + esc(maskMail(p && p.parent_email)) + '</b>. Cuando autorice, toca “Ya autorizaron”.</p><div class="pc-m" role="status"></div>' +
+      '<button class="pc-b" data-r>Ya autorizaron, entrar</button><button class="pc-b alt" data-s>Reenviar el aviso</button><button class="pc-l" data-o>Cerrar sesión</button>', function (o) {
+      out(o);
+      o.querySelector('[data-r]').onclick = function () {
+        checkConsent(true).then(function (ok) { if (ok) { paint(); reconcile(); refreshPushTz(); } else msg('Todavía no hay respuesta de tus padres.', 'e'); });
+      };
+      o.querySelector('[data-s]').onclick = function () {
+        sb.auth.getSession().then(function (x) { return callConsent({ action: 'request', force: true }, x.data.session && x.data.session.access_token); })
+          .then(function (j) { if (j && j.ok) msg('Aviso enviado. Revisa que le llegue (también en spam).', 'o'); else if (j && j.error === 'wait') msg('Espera un par de minutos para reenviar.', 'e'); else msg('No se pudo enviar. Intenta de nuevo.', 'e'); })
+          .catch(function () { msg('Sin conexión. Revisa tu internet.', 'e'); });
+      };
+    }, true);
+  }
+  /* Pantalla que ve el padre/madre al abrir el enlace del correo (no necesita cuenta) */
+  function consentSheet(token) {
+    show('<h2>Autorización</h2><p>Un momento…</p>');
+    fetch(C.SUPABASE_URL + '/functions/v1/parent-consent?token=' + encodeURIComponent(token), { headers: { apikey: C.SUPABASE_ANON_KEY } })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (!j || !j.ok) { show('<h2>Enlace no válido</h2><p>Este enlace venció o ya se usó. Pídele a tu hijo/a que reenvíe el aviso desde la app.</p>'); return; }
+        show('<h2>¿Autorizas el uso de Plata Clara?</h2><p><b>' + esc(j.nombre) + '</b> quiere usar Plata Clara, una app de finanzas personales. Como tiene menos de 14 años, necesitamos tu permiso. Se guardarán sus datos de registro y los movimientos de dinero que anote.</p>' +
+          '<button class="pc-b" data-d="approve">Sí, autorizo</button><button class="pc-b alt" data-d="reject">No autorizo</button><div class="pc-m" role="status"></div>', function (o) {
+          o.querySelectorAll('[data-d]').forEach(function (b) {
+            b.onclick = function () {
+              o.querySelectorAll('[data-d]').forEach(function (x) { x.disabled = true; });
+              var ok = b.getAttribute('data-d') === 'approve';
+              callConsent({ action: 'decide', token: token, decision: b.getAttribute('data-d') }).then(function (r) {
+                if (r && r.ok) show('<h2>' + (ok ? 'Listo, autorizado' : 'Respuesta enviada') + '</h2><p>' + (ok ? 'Ya puede entrar a la app.' : 'No se permitirá el uso de la app.') + ' Puedes cerrar esta página.</p>');
+                else { msg('No se pudo enviar. Intenta de nuevo.', 'e'); o.querySelectorAll('[data-d]').forEach(function (x) { x.disabled = false; }); }
+              }).catch(function () { msg('Sin conexión. Intenta de nuevo.', 'e'); o.querySelectorAll('[data-d]').forEach(function (x) { x.disabled = false; }); });
+            };
+          });
+        });
+      })
+      .catch(function () { show('<h2>Sin conexión</h2><p>Revisa tu internet y abre el enlace de nuevo.</p>'); });
+  }
+
   function authSheet(mode) {
-    var reg = mode === 'register', reset = mode === 'reset';
+    var reg = mode === 'register', reset = mode === 'reset', today = new Date().toISOString().slice(0, 10);
+    var personal = reg ?
+      '<label for="pc-n">Nombre</label><input id="pc-n" maxlength="40" autocomplete="given-name" required>' +
+      '<label for="pc-a">Apellido</label><input id="pc-a" maxlength="40" autocomplete="family-name" required>' +
+      '<label for="pc-g">Género</label><select id="pc-g" required><option value="">Elige una opción</option><option value="F">Femenino</option><option value="M">Masculino</option><option value="O">Otro</option><option value="N">Prefiero no decirlo</option></select>' +
+      '<label for="pc-d">Fecha de nacimiento</label><input id="pc-d" type="date" min="1900-01-01" max="' + today + '" required>' +
+      '<div id="pc-par" hidden><label for="pc-pe">Correo de tu mamá, papá o tutor</label><input id="pc-pe" type="email" autocomplete="off"><div class="pc-m" style="min-height:0">Tienes menos de 14 años: le enviaremos un aviso para que autorice que uses la app. Sin su permiso no podrás entrar.</div></div>' : '';
     show(
       '<h2>' + (reset ? 'Recuperar contraseña' : reg ? 'Crear cuenta' : 'Ingresar') + '</h2>' +
       '<p>' + (reset ? 'Te enviaremos un enlace a tu correo.' : 'Tus datos se guardan en la nube y los ves en todos tus dispositivos.') + '</p>' +
-      '<form id="pc-f"><label for="pc-e">Correo</label><input id="pc-e" type="email" autocomplete="email" required>' +
-      (reset ? '' : '<label for="pc-p">Contraseña</label><input id="pc-p" type="password" minlength="6" autocomplete="' + (reg ? 'new-password' : 'current-password') + '" required>') +
+      '<form id="pc-f">' + personal +
+      '<label for="pc-e">Correo</label><input id="pc-e" type="email" autocomplete="email" required>' +
+      (reg ? '<label for="pc-e2">Confirma tu correo</label><input id="pc-e2" type="email" autocomplete="off" required>' : '') +
+      (reset ? '' : '<label for="pc-p">' + (reg ? 'Crea una contraseña para la app' : 'Contraseña') + '</label><input id="pc-p" type="password" minlength="' + (reg ? 8 : 6) + '" autocomplete="' + (reg ? 'new-password' : 'current-password') + '" required>') +
+      (reg ? '<div class="pc-m" style="min-height:0;margin-top:4px">Mínimo 8 caracteres. Que sea distinta a la contraseña de tu correo.</div><label for="pc-p2">Confirma la contraseña</label><input id="pc-p2" type="password" autocomplete="new-password" required>' : '') +
       '<button class="pc-b" type="submit">' + (reset ? 'Enviar enlace' : reg ? 'Crear cuenta' : 'Ingresar') + '</button></form>' +
       '<div class="pc-m" role="status"></div>' +
       (reset ? '<button class="pc-l" data-m="login">Volver</button>' :
@@ -261,15 +365,31 @@
       '',
       function (o) {
         o.querySelectorAll('[data-m]').forEach(function (b) { b.onclick = function () { authSheet(b.getAttribute('data-m')); }; });
+        var dI = o.querySelector('#pc-d');
+        if (dI) { var tog = function () { var a = age(dI.value), par = o.querySelector('#pc-par'), pe = o.querySelector('#pc-pe'); var minor = a != null && a >= 0 && a < 14; par.hidden = !minor; pe.required = minor; }; dI.onchange = tog; dI.oninput = tog; }
+        var val = function (id) { var x = o.querySelector(id); return x ? x.value.trim() : ''; };
         o.querySelector('#pc-f').onsubmit = function (ev) {
           ev.preventDefault(); ev.stopPropagation();   // que el manejador global de la app no lo tome como suyo
-          var email = o.querySelector('#pc-e').value.trim(), pw = (o.querySelector('#pc-p') || {}).value, go = o.querySelector('.pc-b');
+          var email = val('#pc-e'), pw = (o.querySelector('#pc-p') || {}).value, go = o.querySelector('.pc-b'), meta = null, minor = false, bad = '';
+          if (reg) {
+            var nm = val('#pc-n'), ap = val('#pc-a'), ge = val('#pc-g'), fd = val('#pc-d'), ag = age(fd), pe = val('#pc-pe');
+            minor = ag != null && ag < 14;
+            if (!nm || !ap || !ge || !fd || ag == null || ag < 0 || ag > 120) bad = 'Completa todos tus datos.';
+            else if (email.toLowerCase() !== val('#pc-e2').toLowerCase()) bad = 'Los correos no coinciden.';
+            else if (!pw || pw.length < 8) bad = 'La contraseña debe tener al menos 8 caracteres.';
+            else if (pw !== o.querySelector('#pc-p2').value) bad = 'Las contraseñas no coinciden.';
+            else if (minor && !MAILRE.test(pe)) bad = 'Escribe un correo válido de tu mamá, papá o tutor.';
+            else if (minor && pe.toLowerCase() === email.toLowerCase()) bad = 'El correo de tu mamá, papá o tutor debe ser distinto al tuyo.';
+            meta = { nombre: nm, apellido: ap, genero: ge, fecha_nacimiento: fd };
+            if (minor) meta.parent_email = pe;
+          }
+          if (bad) { msg(bad, 'e'); return; }
           go.disabled = true; msg('');
           client().then(function () {
             if (reset) return sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname }).then(function (r) { if (r.error) throw r.error; msg('Listo. Revisa tu correo.', 'o'); });
-            if (reg) return sb.auth.signUp({ email: email, password: pw, options: { emailRedirectTo: location.origin + location.pathname } }).then(function (r) {
+            if (reg) return sb.auth.signUp({ email: email, password: pw, options: { data: meta, emailRedirectTo: location.origin + location.pathname } }).then(function (r) {
               if (r.error) throw r.error;
-              if (!r.data.session) { msg('Te enviamos un correo. Toca el enlace para confirmar y luego ingresa.', 'o'); }
+              if (!r.data.session) { msg(minor ? 'Te enviamos un correo para confirmar tu cuenta. Al entrar, avisaremos a tu mamá, papá o tutor para que autorice.' : 'Te enviamos un correo. Toca el enlace para confirmar y luego ingresa.', 'o'); }
             });
             return sb.auth.signInWithPassword({ email: email, password: pw }).then(function (r) { if (r.error) throw r.error; });
           }).catch(function (e) { msg(friendly(e), 'e'); }).then(function () { go.disabled = false; });
@@ -351,7 +471,7 @@
 
   var lastUid = null;
   function paint() {
-    if (user) unlock();
+    if (user && consentOK) unlock();
     if ((user && user.id) !== lastUid) { lastUid = user && user.id; nt.err = ''; refreshNotif(); }
     if (!btn) return;
     btn.classList.toggle('on', !!user);
@@ -371,7 +491,7 @@
     lock();
     show('<h2>Cargando…</h2><p>Un momento.</p>');
     client().then(function () { return sb.auth.getSession(); }).then(function (r) {
-      if (r.data.session) { if (!user) { user = r.data.session.user; paint(); reconcile(); } }
+      if (r.data.session) { if (!user) { user = r.data.session.user; } checkConsent().then(function (ok) { if (ok) { paint(); reconcile(); } }); }
       else authSheet('login');
     }).catch(function () {
       if (getMark().uid) { unlock(); return; }   // ya ingresó antes en este dispositivo: dejar usar sin internet
@@ -379,5 +499,6 @@
         function (o) { o.querySelector('[data-r]').onclick = boot; });
     });
   }
-  boot();
+  var ctoken = null; try { ctoken = new URLSearchParams(location.search).get('consent'); } catch (e) {}
+  if (ctoken) { lock(); consentSheet(ctoken); } else boot();
 })();
