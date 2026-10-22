@@ -114,6 +114,9 @@
     return navigator.serviceWorker.ready.then(function (reg) { return reg.pushManager.getSubscription(); }).catch(function () { return null; });
   }
   function enablePush() {
+    return enablePush0().then(function () { return refreshNotif(); });
+  }
+  function enablePush0() {
     return Notification.requestPermission().then(function (p) {
       if (p !== 'granted') throw new Error('denied');
       return navigator.serviceWorker.ready;
@@ -127,6 +130,9 @@
     }).then(function (r) { if (r.error) throw r.error; });
   }
   function disablePush() {
+    return disablePush0().then(function () { return refreshNotif(); }, function (e) { refreshNotif(); throw e; });
+  }
+  function disablePush0() {
     return currentSub().then(function (s) {
       if (!s) return;
       return sb.from('push_subscriptions').delete().eq('endpoint', s.endpoint).then(function () { return s.unsubscribe(); });
@@ -146,6 +152,49 @@
       return reg.showNotification('Plata Clara', { body: 'Así te avisaremos: “Mañana vence tu cuota”.', icon: 'icon-192.png', tag: 'prueba', data: { url: './#deudas' } });
     });
   }
+
+
+  /* ---------- aviso pequeño con interruptor (Resumen y Deudas) ---------- */
+  var nt = { on: false, busy: false, err: '' };
+  function T(k, v) { try { return window.__pc && window.__pc.t ? window.__pc.t(k, v) : k; } catch (e) { return k; } }
+  function refreshNotif() {
+    if (!VAPID || !user || !pushSupported()) { paintNotif(); return Promise.resolve(); }
+    return currentSub().then(function (s) {
+      nt.on = !!(s && Notification.permission === 'granted');
+    }).catch(function () { nt.on = false; }).then(paintNotif);
+  }
+  function paintNotif() {
+    var el = document.getElementById('notif');
+    if (!el) return;
+    var v = window.__pc && window.__pc.view && window.__pc.view();
+    if (!VAPID || !user || (v !== 'resumen' && v !== 'deudas')) { el.hidden = true; el.innerHTML = ''; return; }
+    var blocked = pushSupported() && Notification.permission === 'denied';
+    var needIOS = isIOS && !standalone;
+    var unsupported = !pushSupported() || needIOS;
+    var sub = unsupported
+      ? (needIOS ? T('En iPhone, agrega la app a tu pantalla de inicio y ábrela desde ese ícono para activar los avisos.') : T('Este navegador no permite avisos.'))
+      : blocked ? T('Los avisos están bloqueados en este dispositivo. Actívalos en los ajustes del navegador.')
+      : nt.err ? nt.err
+      : nt.on ? T('Activados: te avisamos 1 día antes y el mismo día de cada cuota.')
+      : T('Te avisamos 1 día antes y el mismo día de cada cuota, a las 10:00 a. m.');
+    el.hidden = false;
+    el.innerHTML =
+      '<span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9M10 20a2 2 0 0 0 4 0"/></svg></span>' +
+      '<span class="tx"><b id="nt-l">' + esc(T('Avisos de cuotas')) + '</b><small' + ((blocked || nt.err) ? ' class="e"' : '') + '>' + esc(sub) + '</small></span>' +
+      '<button type="button" class="sw" role="switch" aria-labelledby="nt-l" aria-checked="' + (nt.on ? 'true' : 'false') + '"' + ((unsupported || blocked || nt.busy) ? ' disabled' : '') + '></button>';
+    var sw = el.querySelector('.sw');
+    if (sw) sw.onclick = toggleNotif;
+  }
+  function toggleNotif() {
+    if (nt.busy || !user) return;
+    nt.busy = true; nt.err = ''; paintNotif();
+    var job = nt.on ? disablePush() : enablePush();
+    Promise.resolve(job).catch(function (e) {
+      nt.err = (e && e.message === 'denied') ? T('No diste permiso. Vuelve a intentar y elige “Permitir”.') : T('No se pudo cambiar. Intenta de nuevo.');
+    }).then(function () { nt.busy = false; return refreshNotif(); });
+  }
+  document.addEventListener('pc-render', paintNotif);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden && user) refreshNotif(); });
 
   /* ---------- interfaz ---------- */
   var ov = null;
@@ -300,8 +349,10 @@
     });
   }
 
+  var lastUid = null;
   function paint() {
     if (user) unlock();
+    if ((user && user.id) !== lastUid) { lastUid = user && user.id; nt.err = ''; refreshNotif(); }
     if (!btn) return;
     btn.classList.toggle('on', !!user);
     btn.setAttribute('aria-label', user ? 'Tu cuenta' : 'Ingresar');

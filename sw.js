@@ -1,6 +1,6 @@
 // Plata Clara - service worker
 // Estrategia: red primero (siempre intenta bajar lo último), caché solo si no hay internet.
-const CACHE = 'plata-clara-v4';
+const CACHE = 'plata-clara-v5';
 const BASE = ['./', 'index.html', 'config.js', 'cloud.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 
 self.addEventListener('install', function (e) {
