@@ -272,6 +272,12 @@ fr:{"¿De dónde sale este pago?":"D’où vient ce paiement ?","De mis ahorros"
 de:{"¿De dónde sale este pago?":"Woher stammt diese Zahlung?","De mis ahorros":"Aus meinen Ersparnissen"},
 it:{"¿De dónde sale este pago?":"Da dove arriva questo pagamento?","De mis ahorros":"Dai miei risparmi"}};
 Object.keys(N).forEach(function(l){DICT[l]=DICT[l]||{};for(var k in N[l])DICT[l][k]=N[l][k];});})();
+(function(){var N={en:{"Disponible con ahorros":"Available incl. savings","Disponible del mes + lo que tienes ahorrado":"This month’s Available + what you have saved"},
+pt:{"Disponible con ahorros":"Disponível com poupanças","Disponible del mes + lo que tienes ahorrado":"Disponível do mês + o que você poupou"},
+fr:{"Disponible con ahorros":"Disponible avec épargne","Disponible del mes + lo que tienes ahorrado":"Disponible du mois + votre épargne"},
+de:{"Disponible con ahorros":"Verfügbar inkl. Ersparnisse","Disponible del mes + lo que tienes ahorrado":"Verfügbar im Monat + dein Erspartes"},
+it:{"Disponible con ahorros":"Disponibile con risparmi","Disponible del mes + lo que tienes ahorrado":"Disponibile del mese + i tuoi risparmi"}};
+Object.keys(N).forEach(function(l){DICT[l]=DICT[l]||{};for(var k in N[l])DICT[l][k]=N[l][k];});})();
 function K(s){return s;}                    /* marca textos estáticos que se traducen al mostrarlos */
 var LANG='es';
 function t(k,v){
@@ -533,7 +539,7 @@ function setCur(c){if(!validCur(c))return;S.cc=c;nfc={};if(S.demo)reseedDemo();s
 function inMonth(m,k){return m.date.slice(0,7)===k;}
 /* Con mes (k) se ignora el ahorro que ya tenía la persona (prior); sin mes (null) se cuenta todo. */
 function sum(k,type){return S.moves.reduce(function(a,m){return a+(m.type===type&&(k==null||inMonth(m,k))&&!(m.prior&&k!=null)?toBase(m):0);},0);}
-function spentByCat(k){var o={};S.moves.forEach(function(m){if(m.type==='Gasto'&&!m.prior&&inMonth(m,k))o[m.cat]=(o[m.cat]||0)+toBase(m);});return o;}
+function spentByCat(k){var o={};S.moves.forEach(function(m){if(m.type==='Gasto'&&(!m.prior||m.fromSav)&&inMonth(m,k))o[m.cat]=(o[m.cat]||0)+toBase(m);});return o;}
 function goalSaved(g){return g.initial+S.moves.reduce(function(a,m){return a+(m.goalId===g.id?toBase(m):0);},0);}
 function savOut(){return S.moves.reduce(function(a,m){return a+(m.fromSav?toBase(m):0);},0);}
 function debtPaid(d){return d.initial+S.moves.reduce(function(a,m){return a+(m.debtId===d.id?toBase(m):0);},0);}
@@ -674,6 +680,7 @@ function vResumen(){
   var h=alertsHTML()+quickBar()+monthBar();
   h+='<div class="grid stats">'
     +statTile(t('Disponible'),money(libre),t('Después de gastos, ahorro y deudas'),libre<0?'c-exp':'',true)
+    +statTile(t('Disponible con ahorros'),money(libre+sum(null,'Ahorro')-savOut()),t('Disponible del mes + lo que tienes ahorrado'),(libre+sum(null,'Ahorro')-savOut())<0?'c-exp':'c-sav')
     +statTile(t('Ingresos'),money(inc),t('Lo que entró este mes'),'c-inc')
     +statTile(t('Gastos'),money(gas),inc?t('{p}% de tus ingresos',{p:Math.round(gas/inc*100)}):t('Sin ingresos aún'),'c-exp')
     +statTile(t('Ahorrado este mes'),money(ah),t('Total acumulado: {v}',{v:money(sum(null,'Ahorro')-savOut())}),'c-sav')+'</div>';
@@ -786,7 +793,7 @@ function debtOrigin(m,id){
   return '<label class="f full"><span>'+t('¿De dónde sale este pago?')+'</span><select id="'+(id||'f-origin')+'" name="origin"><option value="">'+t('De mis ingresos de este mes')+'</option><option value="ahorro"'+(m&&m.fromSav?' selected':'')+'>'+t('De mis ahorros')+'</option></select></label>';
 }
 function originSel(m,sav){
-  return '<label class="f full"><span>'+t(sav?'¿De dónde viene este ahorro?':'¿Descontar de tus ingresos?')+'</span><select id="f-origin" name="origin"><option value="">'+t(sav?'De mis ingresos de este mes':'Sí, descontar de mi Disponible')+'</option><option value="prior"'+(m.prior?' selected':'')+'>'+t(sav?'Ya lo tenía ahorrado (no afecta este mes)':'No afecta mi Disponible')+'</option></select></label>';
+  return '<label class="f full"><span>'+t(sav?'¿De dónde viene este ahorro?':'¿Descontar de tus ingresos?')+'</span><select id="f-origin" name="origin"><option value="">'+t(sav?'De mis ingresos de este mes':'Sí, descontar de mi Disponible')+'</option>'+(sav?'':'<option value="ahorro"'+(m.fromSav?' selected':'')+'>'+t('De mis ahorros')+'</option>')+'<option value="prior"'+(m.prior&&!m.fromSav?' selected':'')+'>'+t(sav?'Ya lo tenía ahorrado (no afecta este mes)':'No afecta mi Disponible')+'</option></select></label>';
 }
 function moveFields(type,m){
   m=m||{};
@@ -980,7 +987,7 @@ document.addEventListener('submit',function(e){
     var rec={id:s.id||uid(),date:d.date,type:d.type,desc:(d.desc||'').trim(),amount:Math.round(amt*100)/100,note:(d.note||'').trim(),cat:d.type==='Gasto'||d.type==='Ingreso'?(d.cat||'Otro'):''};
     if(d.type==='Ahorro'&&d.goalId)rec.goalId=d.goalId;
     if((d.type==='Ahorro'||d.type==='Gasto'||d.type==='Deuda')&&d.origin==='prior')rec.prior=true;
-    if(d.type==='Deuda'&&d.origin==='ahorro'){rec.prior=true;rec.fromSav=true;}
+    if((d.type==='Deuda'||d.type==='Gasto')&&d.origin==='ahorro'){rec.prior=true;rec.fromSav=true;}
     if(d.type==='Deuda'&&d.debtId)rec.debtId=d.debtId;
     var prevM=s.id?S.moves.filter(function(m){return m.id===s.id;})[0]:null;
     stampFx(rec,d.cc,prevM);
