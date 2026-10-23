@@ -240,6 +240,7 @@ label.f>*:not(span){color:var(--ink);font-weight:400}
         <div class="menu" id="menu" role="menu" hidden>
           <button type="button" class="mi" id="b-account" role="menuitem" hidden><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span id="mi-acc">Mi cuenta</span></button>
           <button type="button" class="mi" data-a="region" role="menuitem"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg><span id="mi-lang">Idioma</span></button>
+          <button type="button" class="mi" data-a="plans" role="menuitem"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg><span>Planes</span></button>
           <button type="button" class="mi" data-a="settings" role="menuitem"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span id="mi-set">Ajustes</span></button>
         </div>
       </div>
@@ -822,6 +823,22 @@ function ccField(sel){
   sel=sel||S.cc;
   return '<label class="f full"><span>'+t('Moneda')+'</span><select name="cc">'+curOptions(sel)+'</select><span class="fx" data-fxn>'+fxNote(sel)+'</span></label>';
 }
+function atLimit(kind){var p=window.PCPlan;if(!p||p.plan!=='free')return false;return kind==='goal'?S.goals.length>=1:S.debts.length>=2;}
+window.addEventListener('pcplan',function(){if(ui.sheet&&ui.sheet.kind==='plans')render();});
+function plansHTML(s){
+  var p=window.PCPlan,cur='';
+  if(p){var days=p.until?Math.max(0,Math.ceil((new Date(p.until)-new Date())/864e5)):0;
+    cur=p.plan==='free'?'Tu plan: <b>Gratis</b>':p.trial?'Tu plan: <b>Plus de prueba</b> · te quedan '+days+' días':'Tu plan: <b>'+(p.plan==='family'?'Familia':'Plus')+'</b>'+(p.until?' · hasta '+new Date(p.until).toLocaleDateString():'');}
+  var why=s.why==='goal'?'Llegaste al límite del plan Gratis: 1 meta.':s.why==='debt'?'Llegaste al límite del plan Gratis: 2 deudas.':'';
+  function card(n,price,lines,on){return '<div style="border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:10px 0;'+(on?'border-color:var(--accent);':'')+'"><div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline"><b>'+n+'</b><span>'+price+'</span></div><ul style="margin:6px 0 0;padding-left:18px;font-size:14px">'+lines.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul></div>';}
+  return '<h2>Planes</h2>'+(why?'<p class="note" style="color:var(--debt,inherit)"><b>'+why+'</b></p>':'')+(cur?'<p class="note">'+cur+'</p>':'')
+    +card('Gratis','S/ 0',['Movimientos, resumen y presupuesto','Hasta 1 meta y 2 deudas'],p&&p.plan==='free')
+    +card('Plus','S/ 9.90 al mes · S/ 79 al año',['Metas y deudas sin límite','Todas las funciones nuevas que vayan saliendo','14 días de prueba gratis al registrarte'],p&&p.plan==='plus')
+    +card('Familia','S/ 14.90 al mes',['Todo lo de Plus','Hasta 5 personas, con un adulto como titular'],p&&p.plan==='family')
+    +'<button class="btn grow" style="width:100%" disabled>Mejorar a Plus · Próximamente</button>'
+    +'<p class="note">El pago será solo con tarjeta de crédito o débito y se renueva automáticamente; podrás cancelar cuando quieras. Precios de referencia, pueden cambiar antes del lanzamiento.</p>'
+    +'<div class="foot"><button class="btn alt" data-a="close">Listo</button></div>';
+}
 function sheetHTML(){
   var s=ui.sheet,h='';
   var sym=esc(curSym(S.cc));
@@ -892,6 +909,8 @@ function sheetHTML(){
     h='<h2>'+t('Idioma')+'</h2>'+regionControls(false)
       +(S.demo?'<p class="note">'+t('Los datos de ejemplo se adaptan al idioma que elijas.')+'</p>':'')
       +'<div class="foot"><button class="btn grow" data-a="close">'+t('Listo')+'</button></div>';
+  }else if(s.kind==='plans'){
+    h=plansHTML(s);
   }else if(s.kind==='settings'){
     var ln='';LANGS.forEach(function(l){if(l.c===LANG)ln=l.n;});
     h='<h2>'+t('Ajustes')+'</h2><button class="btn alt" style="width:100%;text-align:left" data-a="region">'+t('Idioma')+': '+ln+'</button>'
@@ -937,11 +956,12 @@ document.addEventListener('click',function(e){
   else if(a==='filter'){ui.filter=el.dataset.v;render();}
   else if(a==='new'){ui.sheet={kind:'move'};render();}
   else if(a==='edit'){ui.sheet={kind:'move',id:id};render();}
-  else if(a==='goal-new'){ui.sheet={kind:'goal'};render();}
+  else if(a==='goal-new'){ui.sheet=atLimit('goal')?{kind:'plans',why:'goal',noFocus:true}:{kind:'goal'};render();}
+  else if(a==='plans'){ui.sheet={kind:'plans',noFocus:true};render();}
   else if(a==='save-new'){ui.sheet={kind:'move',type:'Ahorro'};render();}
   else if(a==='gfilter'){ui.gfilter=el.dataset.v;render();}
   else if(a==='goal-edit'){ui.sheet={kind:'goal',id:id};render();}
-  else if(a==='debt-new'){ui.sheet={kind:'debt'};render();}
+  else if(a==='debt-new'){ui.sheet=atLimit('debt')?{kind:'plans',why:'debt',noFocus:true}:{kind:'debt'};render();}
   else if(a==='debt-edit'){ui.sheet={kind:'debt',id:id};render();}
   else if(a==='contrib'){ui.sheet={kind:'quick',of:'goal',id:id};render();}
   else if(a==='pay'){ui.sheet={kind:'quick',of:'debt',id:id};render();}

@@ -41,7 +41,7 @@
       sb.auth.onAuthStateChange(function (ev, session) {
         var prev = user && user.id;
         user = session ? session.user : null;
-        if (!user) consentOK = false;
+        if (!user) { consentOK = false; window.PCPlan = null; }
         if (!user && ev === 'SIGNED_OUT') { lock(); authSheet('login'); }
         paint();
         if (user && user.id !== prev && ev !== 'TOKEN_REFRESHED') { checkConsent().then(function (ok) { if (ok) { paint(); reconcile(); refreshPushTz(); } }); }
@@ -78,7 +78,18 @@
     setStatus('ok');
   }
 
+  function loadPlan() {
+    if (!sb || !user) return;
+    try { var k = JSON.parse(localStorage.getItem('plataclara.plan') || 'null'); if (k && k.uid === user.id) window.PCPlan = k; } catch (e) {}
+    sb.rpc('my_plan').then(function (r) {
+      if (r.error || !r.data) return;           // si la función aún no existe, no se aplican límites
+      var p = r.data; p.uid = user.id; window.PCPlan = p;
+      try { localStorage.setItem('plataclara.plan', JSON.stringify(p)); } catch (e) {}
+      window.dispatchEvent(new Event('pcplan'));
+    }, function () {});
+  }
   function reconcile() {
+    loadPlan();
     if (!user) return Promise.resolve();
     setStatus('saving');
     return sb.from('user_data').select('data,updated_at').eq('user_id', user.id).maybeSingle().then(function (r) {
@@ -324,7 +335,7 @@
       .then(function (r) { return r.json(); })
       .then(function (j) {
         if (!j || !j.ok) { show('<h2>Enlace no válido</h2><p>Este enlace venció o ya se usó. Pídele a tu hijo/a que reenvíe el aviso desde la app.</p>'); return; }
-        show('<h2>¿Autorizas el uso de Plata Clara?</h2><p><b>' + esc(j.nombre) + '</b> quiere usar Plata Clara, una app de finanzas personales. Como tiene menos de 14 años, necesitamos tu permiso. Se guardarán sus datos de registro y los movimientos de dinero que anote.</p>' +
+        show('<h2>¿Autorizas el uso de Plata Clara?</h2><p><b>' + esc(j.nombre) + '</b> quiere usar Plata Clara, una app de finanzas personales. Como tiene menos de 14 años, necesitamos tu permiso. Se guardarán sus datos de registro y los movimientos de dinero que anote. Puedes leer los <a href="terminos.html" target="_blank" rel="noopener">Términos</a> y la <a href="privacidad.html" target="_blank" rel="noopener">Política de Privacidad</a>.</p>' +
           '<button class="pc-b" data-d="approve">Sí, autorizo</button><button class="pc-b alt" data-d="reject">No autorizo</button><div class="pc-m" role="status"></div>', function (o) {
           o.querySelectorAll('[data-d]').forEach(function (b) {
             b.onclick = function () {
@@ -357,6 +368,7 @@
       (reg ? '<label for="pc-e2">Confirma tu correo</label><input id="pc-e2" type="email" autocomplete="off" required>' : '') +
       (reset ? '' : '<label for="pc-p">' + (reg ? 'Crea una contraseña para la app' : 'Contraseña') + '</label><input id="pc-p" type="password" minlength="' + (reg ? 8 : 6) + '" autocomplete="' + (reg ? 'new-password' : 'current-password') + '" required>') +
       (reg ? '<div class="pc-m" style="min-height:0;margin-top:4px">Mínimo 8 caracteres. Que sea distinta a la contraseña de tu correo.</div><label for="pc-p2">Confirma la contraseña</label><input id="pc-p2" type="password" autocomplete="new-password" required>' : '') +
+      (reg ? '<label style="display:flex;gap:8px;align-items:flex-start;margin:12px 0 4px;font-size:13px;line-height:1.45"><input id="pc-t" type="checkbox" style="width:auto;margin-top:3px" required><span>He leído y acepto los <a href="terminos.html" target="_blank" rel="noopener">Términos y Condiciones</a> y la <a href="privacidad.html" target="_blank" rel="noopener">Política de Privacidad</a>. Si tengo menos de 18 años, mi mamá, papá o tutor sabe que uso la app.</span></label>' : '') +
       '<button class="pc-b" type="submit">' + (reset ? 'Enviar enlace' : reg ? 'Crear cuenta' : 'Ingresar') + '</button></form>' +
       '<div class="pc-m" role="status"></div>' +
       (reset ? '<button class="pc-l" data-m="login">Volver</button>' :
@@ -380,7 +392,8 @@
             else if (pw !== o.querySelector('#pc-p2').value) bad = 'Las contraseñas no coinciden.';
             else if (minor && !MAILRE.test(pe)) bad = 'Escribe un correo válido de tu mamá, papá o tutor.';
             else if (minor && pe.toLowerCase() === email.toLowerCase()) bad = 'El correo de tu mamá, papá o tutor debe ser distinto al tuyo.';
-            meta = { nombre: nm, apellido: ap, genero: ge, fecha_nacimiento: fd };
+            else if (!o.querySelector('#pc-t').checked) bad = 'Debes aceptar los Términos y la Política de Privacidad.';
+            meta = { nombre: nm, apellido: ap, genero: ge, fecha_nacimiento: fd, terms_version: '2026-10-22' };
             if (minor) meta.parent_email = pe;
           }
           if (bad) { msg(bad, 'e'); return; }

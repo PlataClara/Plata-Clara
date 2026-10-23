@@ -27,6 +27,8 @@ grant select (user_id, nombre, apellido, genero, fecha_nacimiento, parent_email,
   on public.profiles to authenticated;
 
 -- Al crear la cuenta se arma el perfil a partir de los datos del registro.
+alter table public.profiles add column if not exists terms_version text, add column if not exists terms_accepted_at timestamptz;
+
 create or replace function public.handle_new_user() returns trigger
 language plpgsql security definer set search_path = public as $$
 declare m jsonb := coalesce(new.raw_user_meta_data, '{}'::jsonb); fn date; minor boolean;
@@ -34,11 +36,12 @@ begin
   if m ? 'fecha_nacimiento' then
     begin fn := (m->>'fecha_nacimiento')::date; exception when others then return new; end;
     minor := fn > (current_date - interval '14 years');
-    insert into public.profiles(user_id, nombre, apellido, genero, fecha_nacimiento, parent_email, consent_status)
+    insert into public.profiles(user_id, nombre, apellido, genero, fecha_nacimiento, parent_email, consent_status, terms_version, terms_accepted_at)
     values (new.id, left(coalesce(m->>'nombre',''),60), left(coalesce(m->>'apellido',''),60),
             left(coalesce(m->>'genero',''),20), fn,
             case when minor then left(m->>'parent_email',200) end,
-            case when minor then 'pending' else 'not_required' end)
+            case when minor then 'pending' else 'not_required' end,
+            left(m->>'terms_version',20), now())
     on conflict (user_id) do nothing;
   end if;
   return new;
