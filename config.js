@@ -5,5 +5,7 @@ window.PC_CONFIG = {
   SUPABASE_URL: 'https://dcjbvvdpudodzxbaohkj.supabase.co',
   SUPABASE_ANON_KEY: 'sb_publishable_ZecwuyRNL2X27mnC3qG0sg_VhKbWvBn',
   // Clave PÚBLICA para los avisos al celular (la privada va solo en Supabase, nunca aquí).
-  VAPID_PUBLIC_KEY: 'BARf8Jn-y1C-HE4QYXOzp4qIAYnbUnEiayDwP6W9IAb09e9_w1zhwyp9ziCjQDKQRpGr_DzKwktDclgaFeXI4mQ'
+  VAPID_PUBLIC_KEY: 'BARf8Jn-y1C-HE4QYXOzp4qIAYnbUnEiayDwP6W9IAb09e9_w1zhwyp9ziCjQDKQRpGr_DzKwktDclgaFeXI4mQ',
+  // Enlace para que te pidan activar un plan, ej. 'https://wa.me/519XXXXXXXX'. Vacío = se oculta el botón.
+  CONTACT_URL: ''
 };

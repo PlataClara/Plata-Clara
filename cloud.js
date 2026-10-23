@@ -41,7 +41,7 @@
       sb.auth.onAuthStateChange(function (ev, session) {
         var prev = user && user.id;
         user = session ? session.user : null;
-        if (!user) { consentOK = false; window.PCPlan = null; }
+        if (!user) { consentOK = false; window.PCPlan = null; window.PCAdmin = false; window.dispatchEvent(new Event('pcplan')); }
         if (!user && ev === 'SIGNED_OUT') { lock(); authSheet('login'); }
         paint();
         if (user && user.id !== prev && ev !== 'TOKEN_REFRESHED') { checkConsent().then(function (ok) { if (ok) { paint(); reconcile(); refreshPushTz(); } }); }
@@ -78,6 +78,7 @@
     setStatus('ok');
   }
 
+  window.PCRpc = function (n, a) { return sb ? sb.rpc(n, a) : Promise.reject(new Error('sin nube')); };
   function loadPlan() {
     if (!sb || !user) return;
     try { var k = JSON.parse(localStorage.getItem('plataclara.plan') || 'null'); if (k && k.uid === user.id) window.PCPlan = k; } catch (e) {}
@@ -87,6 +88,7 @@
       try { localStorage.setItem('plataclara.plan', JSON.stringify(p)); } catch (e) {}
       window.dispatchEvent(new Event('pcplan'));
     }, function () {});
+    sb.rpc('is_admin').then(function (r) { window.PCAdmin = r.data === true; window.dispatchEvent(new Event('pcplan')); }, function () {});
   }
   function reconcile() {
     loadPlan();
