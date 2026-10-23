@@ -42,7 +42,7 @@
         var prev = user && user.id;
         user = session ? session.user : null;
         if (!user) { consentOK = false; window.PCPlan = null; window.PCAdmin = false; window.dispatchEvent(new Event('pcplan')); }
-        if (!user && ev === 'SIGNED_OUT') { lock(); authSheet('login'); }
+        if (!user && ev === 'SIGNED_OUT') { lock(); accessSheet(); }
         paint();
         if (user && user.id !== prev && ev !== 'TOKEN_REFRESHED') { checkConsent().then(function (ok) { if (ok) { paint(); reconcile(); refreshPushTz(); } }); }
       });
@@ -81,13 +81,6 @@
   window.PCRpc = function (n, a) { return sb ? sb.rpc(n, a) : Promise.reject(new Error('sin nube')); };
   function loadPlan() {
     if (!sb || !user) return;
-    try { var k = JSON.parse(localStorage.getItem('plataclara.plan') || 'null'); if (k && k.uid === user.id) window.PCPlan = k; } catch (e) {}
-    sb.rpc('my_plan').then(function (r) {
-      if (r.error || !r.data) return;           // si la función aún no existe, no se aplican límites
-      var p = r.data; p.uid = user.id; window.PCPlan = p;
-      try { localStorage.setItem('plataclara.plan', JSON.stringify(p)); } catch (e) {}
-      window.dispatchEvent(new Event('pcplan'));
-    }, function () {});
     sb.rpc('is_admin').then(function (r) { window.PCAdmin = r.data === true; window.dispatchEvent(new Event('pcplan')); }, function () {});
   }
   function reconcile() {
@@ -252,6 +245,7 @@
   function msg(t, kind) { var m = ov && ov.querySelector('.pc-m'); if (m) { m.textContent = t; m.className = 'pc-m ' + (kind || ''); } }
   function friendly(e) {
     var m = (e && e.message || '').toLowerCase();
+    if (m.indexOf('sin_acceso') > -1 || m.indexOf('database error saving new user') > -1) return 'Ese correo todavía no tiene acceso. Primero gestiona tu acceso con un pago único.';
     if (m.indexOf('invalid login') > -1) return 'Correo o contraseña incorrectos.';
     if (m.indexOf('already registered') > -1) return 'Ese correo ya tiene cuenta. Ingresa con tu contraseña.';
     if (m.indexOf('password') > -1 && m.indexOf('6') > -1) return 'La contraseña debe tener al menos 6 caracteres.';
@@ -354,6 +348,17 @@
       .catch(function () { show('<h2>Sin conexión</h2><p>Revisa tu internet y abre el enlace de nuevo.</p>'); });
   }
 
+  /* Pantalla de entrada: acceso privado con pago único */
+  function accessSheet() {
+    var u = C.CONTACT_URL || '', wa = u ? u + (u.indexOf('?') > -1 ? '&' : '?') + 'text=' + encodeURIComponent('Hola, quiero gestionar mi acceso a Plata Clara') : '';
+    show('<h2>Acceso privado</h2><p>Plata Clara es de acceso privado. Para usarla, primero gestiona tu acceso con un <b>pago único</b>. Cuando recibamos tu pago te daremos permiso con tu correo y podrás crear tu cuenta.</p>' +
+      (wa ? '<a class="pc-b" href="' + esc(wa) + '" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none">Gestionar mi acceso</a>' : '<div class="pc-m">Pídele el acceso a quien te compartió este enlace.</div>') +
+      '<button class="pc-b alt" data-m="register">Ya me dieron acceso: crear mi cuenta</button>' +
+      '<button class="pc-l" data-m="login">Ya tengo cuenta: ingresar</button>' +
+      '<p class="pc-m" style="min-height:0;margin-top:10px"><a href="terminos.html" target="_blank" rel="noopener">Términos</a> · <a href="privacidad.html" target="_blank" rel="noopener">Privacidad</a></p>',
+      function (o) { o.querySelectorAll('[data-m]').forEach(function (b) { b.onclick = function () { authSheet(b.getAttribute('data-m')); }; }); });
+  }
+
   function authSheet(mode) {
     var reg = mode === 'register', reset = mode === 'reset', today = new Date().toISOString().slice(0, 10);
     var personal = reg ?
@@ -367,6 +372,7 @@
       '<p>' + (reset ? 'Te enviaremos un enlace a tu correo.' : 'Tus datos se guardan en la nube y los ves en todos tus dispositivos.') + '</p>' +
       '<form id="pc-f">' + personal +
       '<label for="pc-e">Correo</label><input id="pc-e" type="email" autocomplete="email" required>' +
+      (reg ? '<div class="pc-m" style="min-height:0">Usa el mismo correo con el que gestionaste tu acceso.</div>' : '') +
       (reg ? '<label for="pc-e2">Confirma tu correo</label><input id="pc-e2" type="email" autocomplete="off" required>' : '') +
       (reset ? '' : '<label for="pc-p">' + (reg ? 'Crea una contraseña para la app' : 'Contraseña') + '</label><input id="pc-p" type="password" minlength="' + (reg ? 8 : 6) + '" autocomplete="' + (reg ? 'new-password' : 'current-password') + '" required>') +
       (reg ? '<div class="pc-m" style="min-height:0;margin-top:4px">Mínimo 8 caracteres. Que sea distinta a la contraseña de tu correo.</div><label for="pc-p2">Confirma la contraseña</label><input id="pc-p2" type="password" autocomplete="new-password" required>' : '') +
@@ -374,11 +380,11 @@
       '<button class="pc-b" type="submit">' + (reset ? 'Enviar enlace' : reg ? 'Crear cuenta' : 'Ingresar') + '</button></form>' +
       '<div class="pc-m" role="status"></div>' +
       (reset ? '<button class="pc-l" data-m="login">Volver</button>' :
-        '<button class="pc-l" data-m="' + (reg ? 'login' : 'register') + '">' + (reg ? 'Ya tengo cuenta' : 'No tengo cuenta, crear una') + '</button>' +
+        '<button class="pc-l" data-m="' + (reg ? 'login' : 'access') + '">' + (reg ? 'Ya tengo cuenta' : 'No tengo cuenta') + '</button>' +
         (reg ? '' : '<br><button class="pc-l" data-m="reset">Olvidé mi contraseña</button>')) +
       '',
       function (o) {
-        o.querySelectorAll('[data-m]').forEach(function (b) { b.onclick = function () { authSheet(b.getAttribute('data-m')); }; });
+        o.querySelectorAll('[data-m]').forEach(function (b) { b.onclick = function () { var m = b.getAttribute('data-m'); if (m === 'access') accessSheet(); else authSheet(m); }; });
         var dI = o.querySelector('#pc-d');
         if (dI) { var tog = function () { var a = age(dI.value), par = o.querySelector('#pc-par'), pe = o.querySelector('#pc-pe'); var minor = a != null && a >= 0 && a < 14; par.hidden = !minor; pe.required = minor; }; dI.onchange = tog; dI.oninput = tog; }
         var val = function (id) { var x = o.querySelector(id); return x ? x.value.trim() : ''; };
@@ -402,7 +408,11 @@
           go.disabled = true; msg('');
           client().then(function () {
             if (reset) return sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname }).then(function (r) { if (r.error) throw r.error; msg('Listo. Revisa tu correo.', 'o'); });
-            if (reg) return sb.auth.signUp({ email: email, password: pw, options: { data: meta, emailRedirectTo: location.origin + location.pathname } }).then(function (r) {
+            if (reg) return sb.rpc('can_register', { p_email: email }).then(function (g) {
+              if (g.error) throw g.error;
+              if (g.data !== true) throw new Error('sin_acceso');
+              return sb.auth.signUp({ email: email, password: pw, options: { data: meta, emailRedirectTo: location.origin + location.pathname } });
+            }).then(function (r) {
               if (r.error) throw r.error;
               if (!r.data.session) { msg(minor ? 'Te enviamos un correo para confirmar tu cuenta. Al entrar, avisaremos a tu mamá, papá o tutor para que autorice.' : 'Te enviamos un correo. Toca el enlace para confirmar y luego ingresa.', 'o'); }
             });
@@ -497,7 +507,7 @@
   if (btn) btn.addEventListener('click', function () {
     client().then(function () { return sb.auth.getSession(); }).then(function (r) {
       user = r.data.session ? r.data.session.user : null;
-      if (user) accountSheet(); else authSheet('login');
+      if (user) accountSheet(); else accessSheet();
     }).catch(function () { show('<h2>Sin conexión</h2><p>No se pudo cargar el inicio de sesión. Revisa tu internet.</p><button class="pc-b" data-x>Cerrar</button>', function (o) { o.querySelector('[data-x]').onclick = close; }); });
   });
 
@@ -507,7 +517,7 @@
     show('<h2>Cargando…</h2><p>Un momento.</p>');
     client().then(function () { return sb.auth.getSession(); }).then(function (r) {
       if (r.data.session) { if (!user) { user = r.data.session.user; } checkConsent().then(function (ok) { if (ok) { paint(); reconcile(); } }); }
-      else authSheet('login');
+      else accessSheet();
     }).catch(function () {
       if (getMark().uid) { unlock(); return; }   // ya ingresó antes en este dispositivo: dejar usar sin internet
       show('<h2>Sin conexión</h2><p>Necesitas internet para ingresar la primera vez.</p><button class="pc-b" data-r>Reintentar</button>',

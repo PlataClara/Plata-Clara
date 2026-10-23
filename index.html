@@ -240,8 +240,7 @@ label.f>*:not(span){color:var(--ink);font-weight:400}
         <div class="menu" id="menu" role="menu" hidden>
           <button type="button" class="mi" id="b-account" role="menuitem" hidden><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span id="mi-acc">Mi cuenta</span></button>
           <button type="button" class="mi" data-a="region" role="menuitem"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg><span id="mi-lang">Idioma</span></button>
-          <button type="button" class="mi" data-a="plans" role="menuitem"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg><span>Planes</span></button>
-          <button type="button" class="mi" id="b-admin" data-a="admin" role="menuitem" hidden><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg><span>Administrar</span></button>
+          <button type="button" class="mi" id="b-admin" data-a="admin" role="menuitem" hidden><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg><span>Dar acceso</span></button>
           <button type="button" class="mi" data-a="settings" role="menuitem"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span id="mi-set">Ajustes</span></button>
         </div>
       </div>
@@ -824,30 +823,15 @@ function ccField(sel){
   sel=sel||S.cc;
   return '<label class="f full"><span>'+t('Moneda')+'</span><select name="cc">'+curOptions(sel)+'</select><span class="fx" data-fxn>'+fxNote(sel)+'</span></label>';
 }
-function atLimit(kind){var p=window.PCPlan;if(!p||p.plan!=='free')return false;return kind==='goal'?S.goals.length>=1:S.debts.length>=2;}
-window.addEventListener('pcplan',function(){var b=document.getElementById('b-admin');if(b)b.hidden=!window.PCAdmin;if(ui.sheet&&ui.sheet.kind==='plans')render();});
-var PN={plus:'Plus',family:'Familia',lifetime:'De por vida'};
-function admLoad(){window.PCRpc&&window.PCRpc('admin_list').then(function(r){var box=document.getElementById('adm-list');if(!box)return;var rows=r.data||[];
-  box.innerHTML=rows.length?rows.map(function(x){return '<div style="display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:14px"><span style="overflow:hidden;text-overflow:ellipsis">'+esc(x.email)+'</span><span style="white-space:nowrap">'+esc(PN[x.plan]||x.plan)+(x.until?' · '+new Date(x.until).toLocaleDateString():'')+'</span></div>';}).join(''):'<p class="note">Aún no hay cuentas con plan.</p>';},function(){});}
-function admGo(){var e=(document.getElementById('adm-e').value||'').trim(),p=document.getElementById('adm-p').value,m=+document.getElementById('adm-m').value,msg=document.getElementById('adm-msg');
+window.addEventListener('pcplan',function(){var b=document.getElementById('b-admin');if(b)b.hidden=!window.PCAdmin;});
+function admLoad(){window.PCRpc&&window.PCRpc('admin_access_list').then(function(r){var box=document.getElementById('adm-list');if(!box)return;var rows=r.data||[];
+  box.innerHTML=rows.length?rows.map(function(x){return '<div style="display:flex;justify-content:space-between;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line);font-size:14px"><span style="overflow:hidden;text-overflow:ellipsis">'+esc(x.email)+(x.note?' <small>('+esc(x.note)+')</small>':'')+'</span><span style="white-space:nowrap">'+(x.registered?'Con cuenta':'Esperando')+' <button class="btn sm alt" data-a="adm-del" data-email="'+esc(x.email)+'">Quitar</button></span></div>';}).join(''):'<p class="note">Aún no has dado acceso a nadie.</p>';},function(){});}
+function admGo(){var e=(document.getElementById('adm-e').value||'').trim(),n=(document.getElementById('adm-n').value||'').trim(),msg=document.getElementById('adm-msg');
   if(!e){msg.textContent='Escribe el correo.';return;}
-  msg.textContent='Aplicando…';
-  window.PCRpc('admin_set_plan',{p_email:e,p_plan:p,p_months:m}).then(function(r){var d=r.data||{};msg.textContent=r.error?'No se pudo aplicar.':d.error==='no_user'?'Esa persona aún no tiene cuenta con ese correo.':'Listo: aplicado.';admLoad();},function(){msg.textContent='Sin conexión.';});}
-function plansHTML(s){
-  var p=window.PCPlan,cur='';
-  if(p){var days=p.until?Math.max(0,Math.ceil((new Date(p.until)-new Date())/864e5)):0;
-    cur=p.plan==='free'?'Tu plan: <b>Gratis</b>':p.trial?'Tu plan: <b>Plus de prueba</b> · te quedan '+days+' días':'Tu plan: <b>'+(p.plan==='family'?'Familia':p.plan==='lifetime'?'De por vida':'Plus')+'</b>'+(p.until?' · hasta '+new Date(p.until).toLocaleDateString():'');}
-  var why=s.why==='goal'?'Llegaste al límite del plan Gratis: 1 meta.':s.why==='debt'?'Llegaste al límite del plan Gratis: 2 deudas.':'';
-  function card(n,price,lines,on){return '<div style="border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:10px 0;'+(on?'border-color:var(--accent);':'')+'"><div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline"><b>'+n+'</b><span>'+price+'</span></div><ul style="margin:6px 0 0;padding-left:18px;font-size:14px">'+lines.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul></div>';}
-  return '<h2>Planes</h2>'+(why?'<p class="note" style="color:var(--debt,inherit)"><b>'+why+'</b></p>':'')+(cur?'<p class="note">'+cur+'</p>':'')
-    +card('Gratis','S/ 0',['Movimientos, resumen y presupuesto','Hasta 1 meta y 2 deudas'],p&&p.plan==='free')
-    +card('Plus','S/ 9.90 al mes · S/ 79 al año',['Metas y deudas sin límite','Todas las funciones nuevas que vayan saliendo','14 días de prueba gratis al registrarte'],p&&p.plan==='plus')
-    +card('Familia','S/ 14.90 al mes',['Todo lo de Plus','Para tu familia, con un adulto como titular'],p&&p.plan==='family')
-    +card('De por vida','S/ 99 · pago único',['Todo lo de Plus, sin renovaciones','Dura mientras la app esté disponible'],p&&p.plan==='lifetime')
-    +((window.PC_CONFIG&&window.PC_CONFIG.CONTACT_URL)?'<button class="btn grow" style="width:100%" data-a="contact">Pedir activación de un plan</button>':'<button class="btn grow" style="width:100%" disabled>Pago con tarjeta · Próximamente</button>')
-    +'<p class="note">Precios de referencia: pueden cambiar antes del lanzamiento. El pago con tarjeta se renueva automáticamente (menos De por vida) y podrás cancelar cuando quieras.</p>'
-    +'<div class="foot"><button class="btn alt" data-a="close">Listo</button></div>';
-}
+  msg.textContent='Guardando…';
+  window.PCRpc('admin_access_add',{p_email:e,p_note:n||null}).then(function(r){var d=r.data||{};msg.textContent=r.error?'No se pudo guardar.':d.error==='bad_email'?'Ese correo no parece válido.':'Listo: ya puede crear su cuenta con ese correo.';if(!r.error&&!d.error){document.getElementById('adm-e').value='';document.getElementById('adm-n').value='';}admLoad();},function(){msg.textContent='Sin conexión.';});}
+function admDel(email){if(!confirm('¿Quitar el acceso a '+email+'? Si aún no creó su cuenta, ya no podrá crearla. Si ya la tiene, su cuenta no se borra.'))return;
+  window.PCRpc('admin_access_remove',{p_email:email}).then(function(){admLoad();},function(){});}
 function sheetHTML(){
   var s=ui.sheet,h='';
   var sym=esc(curSym(S.cc));
@@ -919,15 +903,12 @@ function sheetHTML(){
       +(S.demo?'<p class="note">'+t('Los datos de ejemplo se adaptan al idioma que elijas.')+'</p>':'')
       +'<div class="foot"><button class="btn grow" data-a="close">'+t('Listo')+'</button></div>';
   }else if(s.kind==='admin'){
-    h='<h2>Administrar planes</h2><p class="note">Solo tú ves esto. Activa lo que te pagaron.</p>'
+    h='<h2>Dar acceso</h2><p class="note">Cuando alguien te pague, escribe aquí su correo. Así podrá crear su cuenta.</p>'
       +'<label class="f full"><span>Correo de la persona</span><input id="adm-e" type="email" autocomplete="off"></label>'
-      +'<label class="f full"><span>Plan</span><select id="adm-p"><option value="plus">Plus</option><option value="family">Familia</option><option value="lifetime">De por vida</option><option value="free">Quitar (pasa a Gratis)</option></select></label>'
-      +'<label class="f full"><span>Duración (no aplica a De por vida)</span><select id="adm-m"><option value="1">1 mes</option><option value="3">3 meses</option><option value="12">1 año</option></select></label>'
-      +'<button class="btn grow" style="width:100%;margin-top:10px" data-a="adm-go">Aplicar</button><p class="note" id="adm-msg" role="status"></p>'
-      +'<h3 style="margin:14px 0 4px;font-size:15px">Cuentas con plan</h3><div id="adm-list"><p class="note">Cargando…</p></div>'
+      +'<label class="f full"><span>Nota (opcional): nombre o cómo pagó</span><input id="adm-n" maxlength="60" autocomplete="off"></label>'
+      +'<button class="btn grow" style="width:100%;margin-top:10px" data-a="adm-go">Dar acceso</button><p class="note" id="adm-msg" role="status"></p>'
+      +'<h3 style="margin:14px 0 4px;font-size:15px">Personas con acceso</h3><div id="adm-list"><p class="note">Cargando…</p></div>'
       +'<div class="foot"><button class="btn alt" data-a="close">Listo</button></div>';
-  }else if(s.kind==='plans'){
-    h=plansHTML(s);
   }else if(s.kind==='settings'){
     var ln='';LANGS.forEach(function(l){if(l.c===LANG)ln=l.n;});
     h='<h2>'+t('Ajustes')+'</h2><button class="btn alt" style="width:100%;text-align:left" data-a="region">'+t('Idioma')+': '+ln+'</button>'
@@ -973,15 +954,14 @@ document.addEventListener('click',function(e){
   else if(a==='filter'){ui.filter=el.dataset.v;render();}
   else if(a==='new'){ui.sheet={kind:'move'};render();}
   else if(a==='edit'){ui.sheet={kind:'move',id:id};render();}
-  else if(a==='goal-new'){ui.sheet=atLimit('goal')?{kind:'plans',why:'goal',noFocus:true}:{kind:'goal'};render();}
-  else if(a==='plans'){ui.sheet={kind:'plans',noFocus:true};render();}
+  else if(a==='goal-new'){ui.sheet={kind:'goal'};render();}
   else if(a==='admin'){ui.sheet={kind:'admin',noFocus:true};render();admLoad();}
   else if(a==='adm-go'){admGo();}
-  else if(a==='contact'){window.open(window.PC_CONFIG.CONTACT_URL,'_blank','noopener');}
+  else if(a==='adm-del'){admDel(el.dataset.email);}
   else if(a==='save-new'){ui.sheet={kind:'move',type:'Ahorro'};render();}
   else if(a==='gfilter'){ui.gfilter=el.dataset.v;render();}
   else if(a==='goal-edit'){ui.sheet={kind:'goal',id:id};render();}
-  else if(a==='debt-new'){ui.sheet=atLimit('debt')?{kind:'plans',why:'debt',noFocus:true}:{kind:'debt'};render();}
+  else if(a==='debt-new'){ui.sheet={kind:'debt'};render();}
   else if(a==='debt-edit'){ui.sheet={kind:'debt',id:id};render();}
   else if(a==='contrib'){ui.sheet={kind:'quick',of:'goal',id:id};render();}
   else if(a==='pay'){ui.sheet={kind:'quick',of:'debt',id:id};render();}

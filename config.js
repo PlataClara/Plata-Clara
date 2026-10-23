@@ -7,5 +7,5 @@ window.PC_CONFIG = {
   // Clave PÚBLICA para los avisos al celular (la privada va solo en Supabase, nunca aquí).
   VAPID_PUBLIC_KEY: 'BARf8Jn-y1C-HE4QYXOzp4qIAYnbUnEiayDwP6W9IAb09e9_w1zhwyp9ziCjQDKQRpGr_DzKwktDclgaFeXI4mQ',
   // Enlace para que te pidan activar un plan, ej. 'https://wa.me/519XXXXXXXX'. Vacío = se oculta el botón.
-  CONTACT_URL: 'https://wa.me/51924159231'
+  CONTACT_URL: ''
 };
