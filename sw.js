@@ -1,6 +1,6 @@
 // Plata Clara - service worker
 // Estrategia: red primero (siempre intenta bajar lo último), caché solo si no hay internet.
-const CACHE = 'plata-clara-v6';
+const CACHE = 'plata-clara-v7';
 const BASE = ['./', 'index.html', 'config.js', 'cloud.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'badge.png', 'apple-touch-icon.png'];
 
 self.addEventListener('install', function (e) {
@@ -41,6 +41,7 @@ self.addEventListener('fetch', function (e) {
 self.addEventListener('push', function (e) {
   var d = {};
   try { d = e.data ? e.data.json() : {}; } catch (err) { d = { body: e.data ? e.data.text() : '' }; }
+  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (list) { list.forEach(function (c) { c.postMessage({ type: 'pc-push' }); }); }));
   e.waitUntil(self.registration.showNotification(d.title || 'Plata Clara', {
     body: d.body || '',
     icon: 'icon-192.png',
