@@ -97,7 +97,7 @@
       }
       if (!hasUserData(local)) return applyRemote(row);        // dispositivo sin datos propios: bajar la nube
       setStatus('ok'); chooseSheet(row);                       // ambos tienen datos: que decida la persona
-    }, function () { setStatus('error'); });
+    }, function () { setStatus('error'); }).then(function () { try { window.__pc.maybeTour(); } catch (e) {} });
   }
 
   document.addEventListener('visibilitychange', function () {
