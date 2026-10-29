@@ -238,6 +238,11 @@ label.f>*:not(span){color:var(--ink);font-weight:400}
 #coach .bub .arr.down{bottom:-9px;border-width:0 1px 1px 0}
 #coach .nav{display:flex;align-items:center;justify-content:space-between;gap:8px}
 #coach .dots{font-size:12px;color:var(--muted)}
+
+.soc-row{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin:18px 0 8px}
+.soc{width:60px;height:60px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line);background:var(--surface2);color:var(--ink);text-decoration:none}
+.soc:hover,.soc:focus-visible{border-color:var(--accent);color:var(--accent)}
+.soc svg{width:28px;height:28px}
 </style>
 </head>
 <body>
@@ -252,7 +257,6 @@ label.f>*:not(span){color:var(--ink);font-weight:400}
           <button type="button" class="mi" id="b-account" role="menuitem" hidden><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span id="mi-acc">Mi cuenta</span></button>
           <button type="button" class="mi" data-a="region" role="menuitem"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg><span id="mi-lang">Idioma</span></button>
           <button type="button" class="mi" id="b-admin" data-a="admin" role="menuitem" hidden><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg><span>Dar acceso</span></button>
-          <button type="button" class="mi" data-a="nav" data-v="billeteras" role="menuitem"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h13v4"/><path d="M3 7v11a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-9a1 1 0 0 0-1-1H5a2 2 0 0 1-2-2z"/><circle cx="16.5" cy="14.5" r="1"/></svg><span id="mi-wal">Billeteras</span></button>
           <button type="button" class="mi" id="b-soc" data-a="social" role="menuitem" hidden><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9z"/></svg><span id="mi-soc">Síguenos</span></button>
           <button type="button" class="mi" data-a="settings" role="menuitem"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span id="mi-set">Ajustes</span></button>
         </div>
@@ -307,6 +311,8 @@ Object.keys(N).forEach(function(l){DICT[l]=DICT[l]||{};for(var k in N[l])DICT[l]
 (function(){var N={"en": {"Síguenos": "Follow us", "Síguenos en nuestras redes": "Follow us on social media", "Escríbenos por WhatsApp": "Message us on WhatsApp"}, "pt": {"Síguenos": "Siga-nos", "Síguenos en nuestras redes": "Siga-nos nas redes sociais", "Escríbenos por WhatsApp": "Escreva para nós no WhatsApp"}, "fr": {"Síguenos": "Suivez-nous", "Síguenos en nuestras redes": "Suivez-nous sur les réseaux sociaux", "Escríbenos por WhatsApp": "Écrivez-nous sur WhatsApp"}, "de": {"Síguenos": "Folge uns", "Síguenos en nuestras redes": "Folge uns in den sozialen Medien", "Escríbenos por WhatsApp": "Schreib uns auf WhatsApp"}, "it": {"Síguenos": "Seguici", "Síguenos en nuestras redes": "Seguici sui social", "Escríbenos por WhatsApp": "Scrivici su WhatsApp"}};
 Object.keys(N).forEach(function(l){DICT[l]=DICT[l]||{};for(var k in N[l])DICT[l][k]=N[l][k];});})();
 (function(){var N={"en": {"¡Bienvenido a Plata Clara!": "Welcome to Plata Clara!", "Te mostramos lo básico en menos de un minuto. Puedes saltar cuando quieras.": "We'll show you the basics in under a minute. You can skip anytime.", "Anota tu dinero": "Record your money", "Con “+ Nuevo” registras un ingreso, un gasto, un ahorro o el pago de una deuda.": "With “+ New” you record income, an expense, a saving or a debt payment.", "Tu dinero disponible": "Your available money", "Aquí ves cuánto te queda este mes, después de gastos, ahorros y deudas.": "Here you see how much you have left this month, after expenses, savings and debts.", "Cambia de sección": "Switch sections", "Movimientos, Presupuesto, Ahorros, Metas y Deudas están aquí.": "Transactions, Budget, Savings, Goals and Debts are here.", "Busca tus movimientos": "Search your transactions", "Escribe una palabra o elige una categoría para encontrar lo que anotaste.": "Type a word or pick a category to find what you recorded.", "Controla tus deudas": "Keep track of your debts", "Agrega una deuda y la app te avisa cuando se acerque cada pago.": "Add a debt and the app alerts you when each payment is near.", "Tu menú": "Your menu", "Aquí están tu cuenta, el idioma, tus billeteras, los ajustes y nuestras redes.": "Here are your account, language, wallets, settings and our social media.", "¡Listo para empezar!": "Ready to start!", "Anota tu primer movimiento con “+ Nuevo”. Tus datos se guardan en la nube.": "Record your first transaction with “+ New”. Your data is saved in the cloud.", "Saltar": "Skip", "Atrás": "Back", "Siguiente": "Next", "Empezar": "Start"}, "pt": {"¡Bienvenido a Plata Clara!": "Boas-vindas ao Plata Clara!", "Te mostramos lo básico en menos de un minuto. Puedes saltar cuando quieras.": "Mostramos o básico em menos de um minuto. Você pode pular quando quiser.", "Anota tu dinero": "Anote seu dinheiro", "Con “+ Nuevo” registras un ingreso, un gasto, un ahorro o el pago de una deuda.": "Com “+ Novo” você registra uma renda, um gasto, uma poupança ou o pagamento de uma dívida.", "Tu dinero disponible": "Seu dinheiro disponível", "Aquí ves cuánto te queda este mes, después de gastos, ahorros y deudas.": "Aqui você vê quanto sobra neste mês, depois de gastos, poupanças e dívidas.", "Cambia de sección": "Mude de seção", "Movimientos, Presupuesto, Ahorros, Metas y Deudas están aquí.": "Movimentações, Orçamento, Poupanças, Metas e Dívidas estão aqui.", "Busca tus movimientos": "Busque suas movimentações", "Escribe una palabra o elige una categoría para encontrar lo que anotaste.": "Digite uma palavra ou escolha uma categoria para achar o que anotou.", "Controla tus deudas": "Controle suas dívidas", "Agrega una deuda y la app te avisa cuando se acerque cada pago.": "Adicione uma dívida e o app avisa quando cada pagamento estiver perto.", "Tu menú": "Seu menu", "Aquí están tu cuenta, el idioma, tus billeteras, los ajustes y nuestras redes.": "Aqui estão sua conta, o idioma, suas carteiras, os ajustes e nossas redes.", "¡Listo para empezar!": "Pronto para começar!", "Anota tu primer movimiento con “+ Nuevo”. Tus datos se guardan en la nube.": "Anote sua primeira movimentação com “+ Novo”. Seus dados ficam salvos na nuvem.", "Saltar": "Pular", "Atrás": "Voltar", "Siguiente": "Próximo", "Empezar": "Começar"}, "fr": {"¡Bienvenido a Plata Clara!": "Bienvenue sur Plata Clara !", "Te mostramos lo básico en menos de un minuto. Puedes saltar cuando quieras.": "Nous vous montrons l'essentiel en moins d'une minute. Vous pouvez passer quand vous voulez.", "Anota tu dinero": "Notez votre argent", "Con “+ Nuevo” registras un ingreso, un gasto, un ahorro o el pago de una deuda.": "Avec « + Nouveau » vous saisissez un revenu, une dépense, une épargne ou un paiement de dette.", "Tu dinero disponible": "Votre argent disponible", "Aquí ves cuánto te queda este mes, después de gastos, ahorros y deudas.": "Vous voyez ici ce qu'il vous reste ce mois-ci, après dépenses, épargne et dettes.", "Cambia de sección": "Changez de section", "Movimientos, Presupuesto, Ahorros, Metas y Deudas están aquí.": "Mouvements, Budget, Épargne, Objectifs et Dettes sont ici.", "Busca tus movimientos": "Cherchez vos mouvements", "Escribe una palabra o elige una categoría para encontrar lo que anotaste.": "Saisissez un mot ou choisissez une catégorie pour retrouver ce que vous avez noté.", "Controla tus deudas": "Suivez vos dettes", "Agrega una deuda y la app te avisa cuando se acerque cada pago.": "Ajoutez une dette et l'app vous prévient quand chaque paiement approche.", "Tu menú": "Votre menu", "Aquí están tu cuenta, el idioma, tus billeteras, los ajustes y nuestras redes.": "Voici votre compte, la langue, vos portefeuilles, les réglages et nos réseaux.", "¡Listo para empezar!": "Prêt à commencer !", "Anota tu primer movimiento con “+ Nuevo”. Tus datos se guardan en la nube.": "Saisissez votre premier mouvement avec « + Nouveau ». Vos données sont enregistrées dans le cloud.", "Saltar": "Passer", "Atrás": "Retour", "Siguiente": "Suivant", "Empezar": "Commencer"}, "de": {"¡Bienvenido a Plata Clara!": "Willkommen bei Plata Clara!", "Te mostramos lo básico en menos de un minuto. Puedes saltar cuando quieras.": "Wir zeigen dir das Wichtigste in unter einer Minute. Du kannst jederzeit überspringen.", "Anota tu dinero": "Trage dein Geld ein", "Con “+ Nuevo” registras un ingreso, un gasto, un ahorro o el pago de una deuda.": "Mit „+ Neu“ trägst du Einnahmen, Ausgaben, Ersparnisse oder Schuldenzahlungen ein.", "Tu dinero disponible": "Dein verfügbares Geld", "Aquí ves cuánto te queda este mes, después de gastos, ahorros y deudas.": "Hier siehst du, was dir diesen Monat bleibt, nach Ausgaben, Ersparnissen und Schulden.", "Cambia de sección": "Wechsle den Bereich", "Movimientos, Presupuesto, Ahorros, Metas y Deudas están aquí.": "Buchungen, Budget, Ersparnisse, Ziele und Schulden findest du hier.", "Busca tus movimientos": "Suche deine Buchungen", "Escribe una palabra o elige una categoría para encontrar lo que anotaste.": "Gib ein Wort ein oder wähle eine Kategorie, um Einträge zu finden.", "Controla tus deudas": "Behalte deine Schulden im Blick", "Agrega una deuda y la app te avisa cuando se acerque cada pago.": "Füge eine Schuld hinzu und die App erinnert dich, wenn eine Zahlung ansteht.", "Tu menú": "Dein Menü", "Aquí están tu cuenta, el idioma, tus billeteras, los ajustes y nuestras redes.": "Hier findest du dein Konto, die Sprache, Geldbörsen, Einstellungen und unsere Netzwerke.", "¡Listo para empezar!": "Bereit zum Start!", "Anota tu primer movimiento con “+ Nuevo”. Tus datos se guardan en la nube.": "Trage deine erste Buchung mit „+ Neu“ ein. Deine Daten werden in der Cloud gespeichert.", "Saltar": "Überspringen", "Atrás": "Zurück", "Siguiente": "Weiter", "Empezar": "Starten"}, "it": {"¡Bienvenido a Plata Clara!": "Benvenuto su Plata Clara!", "Te mostramos lo básico en menos de un minuto. Puedes saltar cuando quieras.": "Ti mostriamo le basi in meno di un minuto. Puoi saltare quando vuoi.", "Anota tu dinero": "Registra i tuoi soldi", "Con “+ Nuevo” registras un ingreso, un gasto, un ahorro o el pago de una deuda.": "Con “+ Nuovo” registri un'entrata, una spesa, un risparmio o il pagamento di un debito.", "Tu dinero disponible": "Il tuo denaro disponibile", "Aquí ves cuánto te queda este mes, después de gastos, ahorros y deudas.": "Qui vedi quanto ti resta questo mese, dopo spese, risparmi e debiti.", "Cambia de sección": "Cambia sezione", "Movimientos, Presupuesto, Ahorros, Metas y Deudas están aquí.": "Movimenti, Budget, Risparmi, Obiettivi e Debiti sono qui.", "Busca tus movimientos": "Cerca i tuoi movimenti", "Escribe una palabra o elige una categoría para encontrar lo que anotaste.": "Scrivi una parola o scegli una categoria per trovare ciò che hai registrato.", "Controla tus deudas": "Tieni sotto controllo i debiti", "Agrega una deuda y la app te avisa cuando se acerque cada pago.": "Aggiungi un debito e l'app ti avvisa quando si avvicina ogni pagamento.", "Tu menú": "Il tuo menu", "Aquí están tu cuenta, el idioma, tus billeteras, los ajustes y nuestras redes.": "Qui trovi il tuo account, la lingua, i portafogli, le impostazioni e i nostri social.", "¡Listo para empezar!": "Pronto per iniziare!", "Anota tu primer movimiento con “+ Nuevo”. Tus datos se guardan en la nube.": "Registra il tuo primo movimento con “+ Nuovo”. I tuoi dati sono salvati nel cloud.", "Saltar": "Salta", "Atrás": "Indietro", "Siguiente": "Avanti", "Empezar": "Inizia"}};
+Object.keys(N).forEach(function(l){DICT[l]=DICT[l]||{};for(var k in N[l])DICT[l][k]=N[l][k];});})();
+(function(){var N={"en": {"Movimientos, Presupuesto, Ahorros, Deudas y Billeteras están aquí.": "Transactions, Budget, Savings, Debts and Wallets are here.", "Tus billeteras": "Your wallets", "Crea una billetera por cada lugar donde guardas dinero (efectivo, Yape, banco) y mira cuánto tienes en cada una.": "Create a wallet for each place where you keep money (cash, bank, payment apps) and see how much you have in each.", "Aquí están tu cuenta, el idioma, los ajustes y nuestras redes.": "Here are your account, language, settings and our social media.", "Tus metas": "Your goals", "Crea una meta (viaje, fondo de emergencia, compra) y ve cuánto te falta.": "Create a goal (trip, emergency fund, purchase) and see how much you have left."}, "pt": {"Movimientos, Presupuesto, Ahorros, Deudas y Billeteras están aquí.": "Movimentações, Orçamento, Poupanças, Dívidas e Carteiras estão aqui.", "Tus billeteras": "Suas carteiras", "Crea una billetera por cada lugar donde guardas dinero (efectivo, Yape, banco) y mira cuánto tienes en cada una.": "Crie uma carteira para cada lugar onde guarda dinheiro (dinheiro, banco, apps de pagamento) e veja quanto tem em cada uma.", "Aquí están tu cuenta, el idioma, los ajustes y nuestras redes.": "Aqui estão sua conta, o idioma, os ajustes e nossas redes.", "Tus metas": "Suas metas", "Crea una meta (viaje, fondo de emergencia, compra) y ve cuánto te falta.": "Crie uma meta (viagem, fundo de emergência, compra) e veja quanto falta."}, "fr": {"Movimientos, Presupuesto, Ahorros, Deudas y Billeteras están aquí.": "Mouvements, Budget, Épargne, Dettes et Portefeuilles sont ici.", "Tus billeteras": "Vos portefeuilles", "Crea una billetera por cada lugar donde guardas dinero (efectivo, Yape, banco) y mira cuánto tienes en cada una.": "Créez un portefeuille pour chaque endroit où vous gardez de l'argent (espèces, banque, applis de paiement) et voyez combien il y a dans chacun.", "Aquí están tu cuenta, el idioma, los ajustes y nuestras redes.": "Voici votre compte, la langue, les réglages et nos réseaux.", "Tus metas": "Vos objectifs", "Crea una meta (viaje, fondo de emergencia, compra) y ve cuánto te falta.": "Créez un objectif (voyage, fonds d'urgence, achat) et voyez ce qu'il vous reste."}, "de": {"Movimientos, Presupuesto, Ahorros, Deudas y Billeteras están aquí.": "Buchungen, Budget, Ersparnisse, Schulden und Geldbörsen findest du hier.", "Tus billeteras": "Deine Geldbörsen", "Crea una billetera por cada lugar donde guardas dinero (efectivo, Yape, banco) y mira cuánto tienes en cada una.": "Lege für jeden Ort, an dem du Geld hast (Bargeld, Bank, Zahlungs-Apps), eine Geldbörse an und sieh, wie viel in jeder ist.", "Aquí están tu cuenta, el idioma, los ajustes y nuestras redes.": "Hier findest du dein Konto, die Sprache, Einstellungen und unsere Netzwerke.", "Tus metas": "Deine Ziele", "Crea una meta (viaje, fondo de emergencia, compra) y ve cuánto te falta.": "Lege ein Ziel an (Reise, Notgroschen, Anschaffung) und sieh, wie viel dir fehlt."}, "it": {"Movimientos, Presupuesto, Ahorros, Deudas y Billeteras están aquí.": "Movimenti, Budget, Risparmi, Debiti e Portafogli sono qui.", "Tus billeteras": "I tuoi portafogli", "Crea una billetera por cada lugar donde guardas dinero (efectivo, Yape, banco) y mira cuánto tienes en cada una.": "Crea un portafoglio per ogni posto in cui tieni i soldi (contanti, banca, app di pagamento) e vedi quanto hai in ciascuno.", "Aquí están tu cuenta, el idioma, los ajustes y nuestras redes.": "Qui trovi il tuo account, la lingua, le impostazioni e i nostri social.", "Tus metas": "I tuoi obiettivi", "Crea una meta (viaje, fondo de emergencia, compra) y ve cuánto te falta.": "Crea un obiettivo (viaggio, fondo di emergenza, acquisto) e vedi quanto ti manca."}};
 Object.keys(N).forEach(function(l){DICT[l]=DICT[l]||{};for(var k in N[l])DICT[l][k]=N[l][k];});})();
 function K(s){return s;}                    /* marca textos estáticos que se traducen al mostrarlos */
 var LANG='es';
@@ -436,8 +442,8 @@ var NAV=[
  ['movimientos',K('Movimientos'),'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>'],
  ['presupuesto',K('Presupuesto'),'<circle cx="12" cy="12" r="9"/><path d="M12 3v9h9"/>'],
  ['ahorros',K('Ahorros'),'<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/>'],
- ['metas',K('Metas'),'<path d="M5 21V4M5 4h12l-2 4 2 4H5"/>'],
- ['deudas',K('Deudas'),'<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/>']
+ ['deudas',K('Deudas'),'<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/>'],
+ ['billeteras',K('Billeteras'),'<path d="M3 7a2 2 0 0 1 2-2h13v4"/><path d="M3 7v11a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-9a1 1 0 0 0-1-1H5a2 2 0 0 1-2-2z"/><circle cx="16.5" cy="14.5" r="1"/>']
 ];
 var TITLES={resumen:K('Resumen'),movimientos:K('Movimientos'),presupuesto:K('Presupuesto mensual'),ahorros:K('Ahorros'),metas:K('Metas'),deudas:K('Deudas'),billeteras:K('Billeteras')};
 var FILTERS=[['Todos',K('Todos')],['Ingreso',K('Ingresos')],['Gasto',K('Gastos')],['Ahorro',K('Ahorros')],['Deuda',K('Deudas')]];
@@ -803,6 +809,18 @@ function vMovs(){
     +CATS.map(function(c){return '<option value="'+esc(c)+'"'+(ui.fcat===c?' selected':'')+'>'+esc(cname(c))+'</option>';}).join('')+'</select></div>';
   return h+'<div id="mlist">'+movList()+'</div>';
 }
+var SOC_ICON={
+Facebook:'<path fill="currentColor" d="M13.5 22v-8.2h2.8l.5-3.3h-3.3V8.4c0-.9.4-1.7 1.8-1.7h1.6V3.8s-1.3-.2-2.5-.2c-2.6 0-4.3 1.6-4.3 4.4v2.5H7.3v3.3h2.8V22z"/>',
+Instagram:'<rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.3" cy="6.7" r="1.2" fill="currentColor"/>',
+TikTok:'<path fill="currentColor" d="M16.6 3c.3 2.3 1.7 3.8 4 4v3.1c-1.5 0-2.9-.5-4-1.3v6.2c0 3.1-2.5 5.5-5.5 5.5S5.7 18.1 5.7 15s2.5-5.5 5.5-5.5c.3 0 .6 0 .9.1v3.2c-.3-.1-.6-.2-.9-.2-1.3 0-2.3 1-2.3 2.3s1 2.3 2.3 2.3 2.3-1 2.3-2.3V3z"/>',
+YouTube:'<rect x="2.5" y="5.5" width="19" height="13" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path fill="currentColor" d="M10 9.2v5.6l5-2.8z"/>',
+WhatsApp:'<path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M3 21l1.6-4.6A8.5 8.5 0 1 1 8 19.5z"/><path fill="currentColor" d="M9 8.5c0 3.5 3 6.5 6.5 6.5l1-1.8-2-1-.9.9c-1-.4-1.9-1.3-2.3-2.3l.9-.9-1-2z"/>'
+};
+function socialHTML(){
+  var L=socials().slice(),CU=(window.PC_CONFIG||{}).CONTACT_URL||'';
+  if(/^https:\/\//i.test(CU))L.push(['WhatsApp',CU]);
+  return '<div class="soc-row">'+L.map(function(x){return '<a class="soc" href="'+esc(x[1])+'" target="_blank" rel="noopener noreferrer" aria-label="'+x[0]+'" title="'+x[0]+'"><svg viewBox="0 0 24 24" aria-hidden="true">'+(SOC_ICON[x[0]]||'')+'</svg></a>';}).join('')+'</div>';
+}
 function socials(){var C=window.PC_CONFIG||{},L=[['Instagram',C.INSTAGRAM_URL],['Facebook',C.FACEBOOK_URL],['TikTok',C.TIKTOK_URL],['YouTube',C.YOUTUBE_URL]];return L.filter(function(x){return /^https:\/\//i.test(x[1]||'');});}
 var WSUG={PEN:['Yape','Plin','BCP','Interbank','BBVA','Scotiabank'],MXN:['Mercado Pago','Nu','BBVA','Banorte'],COP:['Nequi','Daviplata','Bancolombia'],ARS:['Mercado Pago','Ualá','Brubank'],BRL:['Pix','Nubank','Itaú'],EUR:['Bizum','Revolut','N26'],USD:['PayPal','Venmo','Zelle','Cash App'],CLP:['Mercado Pago','Banco Estado','Tenpo'],GBP:['Revolut','Monzo'],CAD:['Interac']};
 function wSug(cc){return [t('Efectivo'),t('Banco'),t('Tarjeta')].concat(WSUG[cc]||[]);}
@@ -922,11 +940,35 @@ function vAhorros(){
   h+='<div class="grid stats" style="grid-template-columns:repeat(2,minmax(0,1fr))">'
     +statTile(t('En metas'),money(inG),t('Aportes a tus metas'),'c-sav')
     +statTile(t('Ahorro general'),money(tot-inG),t('Sin una meta asignada'),'c-sav')+'</div>';
+  h+='<div class="toolbar" style="margin-top:16px"><div class="day" style="margin:0">'+t('Tus metas')+'</div><button class="btn alt sm" data-a="goal-new">'+t('Nueva meta')+'</button></div>';
+  h+=goalsBlock();
   var list=S.moves.filter(function(m){return m.type==='Ahorro'&&mc(m)===S.cc;}).sort(function(a,b){return b.date.localeCompare(a.date);});
   if(!list.length)return h+'<div class="card" style="margin-top:12px"><p class="empty">'+t('Aún no has anotado ahorros. Usa “Nuevo ahorro” para empezar.')+'</p></div>';
-  h+='<div class="day">'+t('Tus ahorros')+'</div><div class="list">'+list.slice(0,60).map(moveRow).join('')+'</div>';
+  h+='<div class="day" style="margin-top:16px">'+t('Tus ahorros')+'</div><div class="list">'+list.slice(0,60).map(moveRow).join('')+'</div>';
   if(list.length>60)h+='<p class="note">'+t('Mostrando los 60 más recientes.')+'</p>';
   return h;
+}
+function goalsBlock(){
+  var GS=S.goals.filter(function(g){return mc(g)===S.cc;}),hasExt=GS.some(function(g){return g.kind==='ext';}),f=hasExt?ui.gfilter:'all';
+    var h='';
+  if(hasExt){
+    h+='<div class="chips" role="group" aria-label="'+esc(t('Filtrar metas'))+'">';
+    [['all',K('Todas')],['own',K('Personales')],['ext',K('Externas')]].forEach(function(x){h+='<button class="chip" data-a="gfilter" data-v="'+x[0]+'" aria-pressed="'+(f===x[0])+'">'+t(x[1])+'</button>';});
+    h+='</div>';
+  }
+  if(!GS.length)return h+'<div class="card"><p class="empty">'+t('Crea una meta (viaje, fondo de emergencia, compra) y ve cuánto te falta.')+'</p></div>';
+  var gs=GS.filter(function(g){return f==='all'||(f==='ext'?g.kind==='ext':g.kind!=='ext');});
+  if(!gs.length)return h+'<div class="card"><p class="empty">'+t('No hay metas en este filtro.')+'</p></div>';
+  h+='<div class="cards">';
+  gs.forEach(function(g){
+    var sv=goalSaved(g),pct=Math.min(100,g.target?sv/g.target*100:0),dl=daysUntil(g.date),ext=g.kind==='ext';
+    var meta=g.date?t('Para el {date}',{date:dateLong(g.date)})+(dl!=null?' · '+(dl<0?t('venció hace {d}',{d:dias(-dl)}):dias(dl)):''):t('Sin fecha');
+    if(ext&&g.owner)meta=t('Meta de {name}',{name:esc(g.owner)})+' · '+meta;
+    h+='<article class="card item"><h3>'+esc(g.name)+(ext?'<span class="tag ext">'+t('Externa')+'</span>':'')+'</h3><p class="meta">'+meta+'</p>'
+     +'<div class="track"><div class="fill sav" style="width:'+pct+'%"></div></div><div class="figs"><span>'+t('Ahorrado')+'<br><b class="num c-sav">'+money(sv)+'</b></span><span style="text-align:right">'+t('Meta')+'<br><b class="num">'+money(g.target)+'</b></span></div>'
+     +'<div class="actions"><button class="btn sm" data-a="contrib" data-id="'+g.id+'">'+t('Aportar')+'</button><button class="btn sm alt" data-a="goal-edit" data-id="'+g.id+'">'+t('Editar')+'</button><span class="num" style="align-self:center;color:var(--muted);font-size:13px">'+Math.round(pct)+'%</span></div></article>';
+  });
+  return h+'</div>';
 }
 function vMetas(){
   var GS=S.goals.filter(function(g){return mc(g)===S.cc;}),hasExt=GS.some(function(g){return g.kind==='ext';}),f=hasExt?ui.gfilter:'all';
@@ -1119,11 +1161,7 @@ function sheetHTML(){
       +'<h3 style="margin:14px 0 4px;font-size:15px">Personas con acceso</h3><div id="adm-list"><p class="note">Cargando…</p></div>'
       +'<div class="foot"><button class="btn alt" data-a="close">Listo</button></div>';
   }else if(s.kind==='social'){
-    var CU=(window.PC_CONFIG||{}).CONTACT_URL||'',btn='display:block;text-align:center;text-decoration:none';
-    h='<h2>'+t('Síguenos en nuestras redes')+'</h2><div style="display:grid;gap:10px;margin-top:10px">'
-      +socials().map(function(x){return '<a class="btn alt" style="'+btn+'" target="_blank" rel="noopener noreferrer" href="'+esc(x[1])+'">'+x[0]+'</a>';}).join('')
-      +(CU?'<a class="btn" style="'+btn+'" target="_blank" rel="noopener noreferrer" href="'+esc(CU)+'">'+t('Escríbenos por WhatsApp')+'</a>':'')
-      +'</div><div class="foot"><button class="btn grow" data-a="close">'+t('Listo')+'</button></div>';
+    h='<h2>'+t('Síguenos en nuestras redes')+'</h2>'+socialHTML()+'<div class="foot"><button class="btn grow" data-a="close">'+t('Listo')+'</button></div>';
   }else if(s.kind==='wallet'){
     var w0=s.id?walletOf(s.id):{cc:S.cc};
     h='<h2>'+t(s.id?K('Editar billetera'):K('Nueva billetera'))+'</h2><form data-kind="wallet"><div class="fgrid">'
@@ -1158,8 +1196,9 @@ function render(){
   var bt=document.getElementById('bottom');bt.innerHTML=nav;bt.setAttribute('aria-label',t('Secciones'));
   document.getElementById('title').textContent=t(TITLES[ui.view]);
   document.getElementById('b-menu').setAttribute('aria-label',t('Ajustes'));
-  document.getElementById('mi-acc').textContent=t('Mi cuenta');document.getElementById('mi-lang').textContent=t('Idioma');document.getElementById('mi-set').textContent=t('Ajustes');document.getElementById('mi-wal').textContent=t('Billeteras');document.getElementById('mi-soc').textContent=t('Síguenos');document.getElementById('b-soc').hidden=!(socials().length||((window.PC_CONFIG||{}).CONTACT_URL));
+  document.getElementById('mi-acc').textContent=t('Mi cuenta');document.getElementById('mi-lang').textContent=t('Idioma');document.getElementById('mi-set').textContent=t('Ajustes');document.getElementById('mi-soc').textContent=t('Síguenos');document.getElementById('b-soc').hidden=!(socials().length||((window.PC_CONFIG||{}).CONTACT_URL));
   document.getElementById('banner').innerHTML=S.demo?'<div class="banner"><span>'+t('<b>Estás viendo datos de ejemplo.</b> Pruébalos y, cuando quieras, empieza con los tuyos.')+'</span><button class="btn sm" data-a="clearall">'+t('Empezar con mis datos')+'</button></div>':'';
+  if(ui.view==='metas')ui.view='ahorros';
   var v=curBar()+{resumen:vResumen,movimientos:vMovs,presupuesto:vPresu,ahorros:vAhorros,metas:vMetas,deudas:vDeudas,billeteras:vBilleteras}[ui.view]();
   if(ui.view==='movimientos'||ui.view==='resumen')v+='<button class="btn fab" data-a="new">'+t('+ Nuevo')+'</button>';
   document.getElementById('view').innerHTML=v;
@@ -1176,10 +1215,11 @@ var COACH=[
  {t:K('¡Bienvenido a Plata Clara!'),p:K('Te mostramos lo básico en menos de un minuto. Puedes saltar cuando quieras.')},
  {sel:'.fab',view:'resumen',t:K('Anota tu dinero'),p:K('Con “+ Nuevo” registras un ingreso, un gasto, un ahorro o el pago de una deuda.')},
  {sel:'.card.stat.hero',view:'resumen',t:K('Tu dinero disponible'),p:K('Aquí ves cuánto te queda este mes, después de gastos, ahorros y deudas.')},
- {sel:'NAV',t:K('Cambia de sección'),p:K('Movimientos, Presupuesto, Ahorros, Metas y Deudas están aquí.')},
+ {sel:'NAV',t:K('Cambia de sección'),p:K('Movimientos, Presupuesto, Ahorros, Deudas y Billeteras están aquí.')},
+ {sel:'[data-a="nav"][data-v="billeteras"]',t:K('Tus billeteras'),p:K('Crea una billetera por cada lugar donde guardas dinero (efectivo, Yape, banco) y mira cuánto tienes en cada una.')},
  {sel:'#mq',view:'movimientos',t:K('Busca tus movimientos'),p:K('Escribe una palabra o elige una categoría para encontrar lo que anotaste.')},
  {sel:'[data-a="debt-new"]',view:'deudas',t:K('Controla tus deudas'),p:K('Agrega una deuda y la app te avisa cuando se acerque cada pago.')},
- {sel:'#b-menu',view:'resumen',t:K('Tu menú'),p:K('Aquí están tu cuenta, el idioma, tus billeteras, los ajustes y nuestras redes.')},
+ {sel:'#b-menu',view:'resumen',t:K('Tu menú'),p:K('Aquí están tu cuenta, el idioma, los ajustes y nuestras redes.')},
  {t:K('¡Listo para empezar!'),p:K('Anota tu primer movimiento con “+ Nuevo”. Tus datos se guardan en la nube.')}
 ];
 var coachI=0,coachOn=false;
@@ -1201,7 +1241,7 @@ function coachShow(){
   if(st.view&&ui.view!==st.view){ui.view=st.view;ui.sheet=null;render();window.scrollTo(0,0);}
   var el=null;
   if(st.sel==='NAV'){var b=document.getElementById('bottom');el=(b&&b.getBoundingClientRect().height>0&&getComputedStyle(b).display!=='none')?b:document.getElementById('side');}
-  else if(st.sel)el=document.querySelector(st.sel);
+  else if(st.sel)el=[].slice.call(document.querySelectorAll(st.sel)).filter(function(e){var q=e.getBoundingClientRect();return q.width>0&&q.height>0;})[0]||null;
   if(el&&st.sel!=='NAV'&&el.scrollIntoView)el.scrollIntoView({block:'center'});
   var r=el?el.getBoundingClientRect():null,pad=6;
   d.innerHTML=(r?'<div class="spot" style="left:'+(r.left-pad)+'px;top:'+(r.top-pad)+'px;width:'+(r.width+pad*2)+'px;height:'+(r.height+pad*2)+'px"></div>':'<div class="spot" style="left:50%;top:50%;width:0;height:0"></div>')

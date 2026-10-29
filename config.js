@@ -9,8 +9,8 @@ window.PC_CONFIG = {
   // Enlace para que te pidan activar un plan, ej. 'https://wa.me/519XXXXXXXX'. Vacío = se oculta el botón.
   CONTACT_URL: 'https://wa.me/51924159231',
   // Redes sociales: pega el enlace completo (empieza con https://). Vacío = no se muestra.
-  INSTAGRAM_URL: '',
-  FACEBOOK_URL: '',
-  TIKTOK_URL: '',
+  INSTAGRAM_URL: 'https://www.instagram.com/plataclara.app',
+  FACEBOOK_URL: 'https://www.facebook.com/share/19rUz3jHFN/',
+  TIKTOK_URL: 'https://www.tiktok.com/@plataclara.app',
   YOUTUBE_URL: ''
 };
