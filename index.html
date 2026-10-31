@@ -230,14 +230,16 @@ label.f>*:not(span){color:var(--ink);font-weight:400}
 
 #coach{position:fixed;inset:0;z-index:300}
 #coach .spot{position:fixed;border-radius:14px;box-shadow:0 0 0 9999px rgba(8,20,16,.74);pointer-events:none;transition:left .25s,top .25s,width .25s,height .25s}
-#coach .bub{position:fixed;width:min(320px,calc(100vw - 24px));background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:20px;padding:14px 16px 12px;box-shadow:0 14px 44px rgba(0,0,0,.4)}
+#coach .bub{position:fixed;width:min(348px,calc(100vw - 20px));background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:20px;padding:14px 16px 12px;box-shadow:0 14px 44px rgba(0,0,0,.4)}
 #coach .bub h3{margin:0 0 4px;font-size:16px}
 #coach .bub p{margin:0 0 12px;font-size:14px;line-height:1.45;color:var(--ink)}
 #coach .bub .arr{position:absolute;width:16px;height:16px;background:var(--surface);border:1px solid var(--line);transform:rotate(45deg)}
 #coach .bub .arr.up{top:-9px;border-width:1px 0 0 1px}
 #coach .bub .arr.down{bottom:-9px;border-width:0 1px 1px 0}
-#coach .nav{display:flex;align-items:center;justify-content:space-between;gap:8px}
-#coach .dots{font-size:12px;color:var(--muted)}
+#coach .nav{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:nowrap}
+#coach .nav>span:last-child{display:flex;gap:6px;white-space:nowrap}
+#coach .nav .btn{padding:8px 12px;white-space:nowrap}
+#coach .dots{font-size:12px;color:var(--muted);white-space:nowrap}
 
 .soc-row{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin:18px 0 8px}
 .soc{width:60px;height:60px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line);background:var(--surface2);color:var(--ink);text-decoration:none}
@@ -314,6 +316,8 @@ Object.keys(N).forEach(function(l){DICT[l]=DICT[l]||{};for(var k in N[l])DICT[l]
 Object.keys(N).forEach(function(l){DICT[l]=DICT[l]||{};for(var k in N[l])DICT[l][k]=N[l][k];});})();
 (function(){var N={"en": {"Movimientos, Presupuesto, Ahorros, Deudas y Billeteras están aquí.": "Transactions, Budget, Savings, Debts and Wallets are here.", "Tus billeteras": "Your wallets", "Crea una billetera por cada lugar donde guardas dinero (efectivo, Yape, banco) y mira cuánto tienes en cada una.": "Create a wallet for each place where you keep money (cash, bank, payment apps) and see how much you have in each.", "Aquí están tu cuenta, el idioma, los ajustes y nuestras redes.": "Here are your account, language, settings and our social media.", "Tus metas": "Your goals", "Crea una meta (viaje, fondo de emergencia, compra) y ve cuánto te falta.": "Create a goal (trip, emergency fund, purchase) and see how much you have left."}, "pt": {"Movimientos, Presupuesto, Ahorros, Deudas y Billeteras están aquí.": "Movimentações, Orçamento, Poupanças, Dívidas e Carteiras estão aqui.", "Tus billeteras": "Suas carteiras", "Crea una billetera por cada lugar donde guardas dinero (efectivo, Yape, banco) y mira cuánto tienes en cada una.": "Crie uma carteira para cada lugar onde guarda dinheiro (dinheiro, banco, apps de pagamento) e veja quanto tem em cada uma.", "Aquí están tu cuenta, el idioma, los ajustes y nuestras redes.": "Aqui estão sua conta, o idioma, os ajustes e nossas redes.", "Tus metas": "Suas metas", "Crea una meta (viaje, fondo de emergencia, compra) y ve cuánto te falta.": "Crie uma meta (viagem, fundo de emergência, compra) e veja quanto falta."}, "fr": {"Movimientos, Presupuesto, Ahorros, Deudas y Billeteras están aquí.": "Mouvements, Budget, Épargne, Dettes et Portefeuilles sont ici.", "Tus billeteras": "Vos portefeuilles", "Crea una billetera por cada lugar donde guardas dinero (efectivo, Yape, banco) y mira cuánto tienes en cada una.": "Créez un portefeuille pour chaque endroit où vous gardez de l'argent (espèces, banque, applis de paiement) et voyez combien il y a dans chacun.", "Aquí están tu cuenta, el idioma, los ajustes y nuestras redes.": "Voici votre compte, la langue, les réglages et nos réseaux.", "Tus metas": "Vos objectifs", "Crea una meta (viaje, fondo de emergencia, compra) y ve cuánto te falta.": "Créez un objectif (voyage, fonds d'urgence, achat) et voyez ce qu'il vous reste."}, "de": {"Movimientos, Presupuesto, Ahorros, Deudas y Billeteras están aquí.": "Buchungen, Budget, Ersparnisse, Schulden und Geldbörsen findest du hier.", "Tus billeteras": "Deine Geldbörsen", "Crea una billetera por cada lugar donde guardas dinero (efectivo, Yape, banco) y mira cuánto tienes en cada una.": "Lege für jeden Ort, an dem du Geld hast (Bargeld, Bank, Zahlungs-Apps), eine Geldbörse an und sieh, wie viel in jeder ist.", "Aquí están tu cuenta, el idioma, los ajustes y nuestras redes.": "Hier findest du dein Konto, die Sprache, Einstellungen und unsere Netzwerke.", "Tus metas": "Deine Ziele", "Crea una meta (viaje, fondo de emergencia, compra) y ve cuánto te falta.": "Lege ein Ziel an (Reise, Notgroschen, Anschaffung) und sieh, wie viel dir fehlt."}, "it": {"Movimientos, Presupuesto, Ahorros, Deudas y Billeteras están aquí.": "Movimenti, Budget, Risparmi, Debiti e Portafogli sono qui.", "Tus billeteras": "I tuoi portafogli", "Crea una billetera por cada lugar donde guardas dinero (efectivo, Yape, banco) y mira cuánto tienes en cada una.": "Crea un portafoglio per ogni posto in cui tieni i soldi (contanti, banca, app di pagamento) e vedi quanto hai in ciascuno.", "Aquí están tu cuenta, el idioma, los ajustes y nuestras redes.": "Qui trovi il tuo account, la lingua, le impostazioni e i nostri social.", "Tus metas": "I tuoi obiettivi", "Crea una meta (viaje, fondo de emergencia, compra) y ve cuánto te falta.": "Crea un obiettivo (viaggio, fondo di emergenza, acquisto) e vedi quanto ti manca."}};
 Object.keys(N).forEach(function(l){DICT[l]=DICT[l]||{};for(var k in N[l])DICT[l][k]=N[l][k];});})();
+(function(){var N={"en": {"Principal": "Main", "Usar como billetera principal": "Use as main wallet", "Es mi billetera de efectivo": "This is my cash wallet", "Saldo": "Balance", "Apartado": "Set aside", "Saldo menos lo apartado para ahorros.": "Balance minus what is set aside for savings.", "Retirar o depositar efectivo": "Withdraw or deposit cash", "Operación": "Operation", "Retirar efectivo": "Withdraw cash", "Depositar efectivo": "Deposit cash", "Billetera digital": "Digital wallet", "Comisión (opcional)": "Fee (optional)", "Retiro": "Withdrawal", "Depósito": "Deposit", "Comisión de retiro": "Withdrawal fee", "Comisión de depósito": "Deposit fee", "Elige una billetera digital.": "Choose a digital wallet.", "Operación guardada": "Operation saved"}, "pt": {"Principal": "Principal", "Usar como billetera principal": "Usar como carteira principal", "Es mi billetera de efectivo": "É minha carteira de dinheiro", "Saldo": "Saldo", "Apartado": "Reservado", "Saldo menos lo apartado para ahorros.": "Saldo menos o que está reservado para poupança.", "Retirar o depositar efectivo": "Sacar ou depositar dinheiro", "Operación": "Operação", "Retirar efectivo": "Sacar dinheiro", "Depositar efectivo": "Depositar dinheiro", "Billetera digital": "Carteira digital", "Comisión (opcional)": "Taxa (opcional)", "Retiro": "Saque", "Depósito": "Depósito", "Comisión de retiro": "Taxa de saque", "Comisión de depósito": "Taxa de depósito", "Elige una billetera digital.": "Escolha uma carteira digital.", "Operación guardada": "Operação salva"}, "fr": {"Principal": "Principale", "Usar como billetera principal": "Utiliser comme portefeuille principal", "Es mi billetera de efectivo": "C'est mon portefeuille d'espèces", "Saldo": "Solde", "Apartado": "Mis de côté", "Saldo menos lo apartado para ahorros.": "Solde moins ce qui est mis de côté pour l'épargne.", "Retirar o depositar efectivo": "Retirer ou déposer des espèces", "Operación": "Opération", "Retirar efectivo": "Retirer des espèces", "Depositar efectivo": "Déposer des espèces", "Billetera digital": "Portefeuille numérique", "Comisión (opcional)": "Frais (facultatif)", "Retiro": "Retrait", "Depósito": "Dépôt", "Comisión de retiro": "Frais de retrait", "Comisión de depósito": "Frais de dépôt", "Elige una billetera digital.": "Choisissez un portefeuille numérique.", "Operación guardada": "Opération enregistrée"}, "de": {"Principal": "Hauptkonto", "Usar como billetera principal": "Als Haupt-Geldbörse verwenden", "Es mi billetera de efectivo": "Das ist meine Bargeld-Geldbörse", "Saldo": "Saldo", "Apartado": "Zurückgelegt", "Saldo menos lo apartado para ahorros.": "Saldo minus das, was für Ersparnisse zurückgelegt ist.", "Retirar o depositar efectivo": "Bargeld abheben oder einzahlen", "Operación": "Vorgang", "Retirar efectivo": "Bargeld abheben", "Depositar efectivo": "Bargeld einzahlen", "Billetera digital": "Digitale Geldbörse", "Comisión (opcional)": "Gebühr (optional)", "Retiro": "Abhebung", "Depósito": "Einzahlung", "Comisión de retiro": "Abhebungsgebühr", "Comisión de depósito": "Einzahlungsgebühr", "Elige una billetera digital.": "Wähle eine digitale Geldbörse.", "Operación guardada": "Vorgang gespeichert"}, "it": {"Principal": "Principale", "Usar como billetera principal": "Usa come portafoglio principale", "Es mi billetera de efectivo": "È il mio portafoglio contanti", "Saldo": "Saldo", "Apartado": "Accantonato", "Saldo menos lo apartado para ahorros.": "Saldo meno quanto accantonato per i risparmi.", "Retirar o depositar efectivo": "Preleva o versa contanti", "Operación": "Operazione", "Retirar efectivo": "Preleva contanti", "Depositar efectivo": "Versa contanti", "Billetera digital": "Portafoglio digitale", "Comisión (opcional)": "Commissione (facoltativa)", "Retiro": "Prelievo", "Depósito": "Versamento", "Comisión de retiro": "Commissione di prelievo", "Comisión de depósito": "Commissione di versamento", "Elige una billetera digital.": "Scegli un portafoglio digitale.", "Operación guardada": "Operazione salvata"}};
+Object.keys(N).forEach(function(l){DICT[l]=DICT[l]||{};for(var k in N[l])DICT[l][k]=N[l][k];});})();
 function K(s){return s;}                    /* marca textos estáticos que se traducen al mostrarlos */
 var LANG='es';
 function t(k,v){
@@ -386,7 +390,8 @@ function fxRefresh(){
 /* Monto de un movimiento expresado en la moneda principal */
 function mc(x){return x.cc||S.home||S.cc;}
 function BC(){return S.bcc||S.home||S.cc;}
-function toBase(m){return mc(m)===S.cc?m.amount:0;}   /* solo cuenta lo que está en la moneda que estás viendo */
+function wf(m){return !(ui.wal&&(ui.view==='resumen'||ui.view==='movimientos'))||m.w===ui.wal;}
+function toBase(m){return mc(m)===S.cc&&wf(m)?m.amount:0;}   /* solo cuenta lo que está en la moneda que estás viendo */
 function stampFx(rec,cc,prev){delete rec.fx;delete rec.fxb;rec.cc=validCur(cc)?cc:((prev&&prev.cc)||S.cc);}
 function migrate(d){
   if(!d)return;
@@ -396,6 +401,19 @@ function migrate(d){
     [d.moves,d.goals,d.debts,d.quicks].forEach(function(l){(l||[]).forEach(function(x){if(!validCur(x.cc))x.cc=d.home;delete x.fx;delete x.fxb;});});
   }
   if(!validCur(d.bcc))d.bcc=d.home;
+  /* cada movimiento pertenece a una billetera */
+  d.wallets=d.wallets||[];
+  var wid={},byCc={};d.wallets.forEach(function(w){wid[w.id]=1;});
+  var mainFor=function(cc){
+    if(byCc[cc])return byCc[cc];
+    var ws=d.wallets.filter(function(w){return w.cc===cc;}),w=ws.filter(function(x){return x.main;})[0]||ws[0];
+    if(!w){w={id:uid(),name:t('Principal'),cc:cc,initial:0,main:true};d.wallets.push(w);wid[w.id]=1;}
+    else if(!ws.some(function(x){return x.main;}))w.main=true;
+    return (byCc[cc]=w);
+  };
+  (d.moves||[]).forEach(function(m){if(!m.w||!wid[m.w])m.w=mainFor(m.cc||d.home||d.cc).id;});
+  (d.goals||[]).concat(d.debts||[]).forEach(function(x){mainFor(x.cc||d.home||d.cc);});
+  mainFor(d.cc);d.wallets.slice().forEach(function(w){mainFor(w.cc);});
 }
 function curBar(){
   var set={};set[S.cc]=1;
@@ -570,7 +588,7 @@ function setBase(c){
   if(S.demo){setCur(c);return;}
   S.cc=c;nfc={};save();render();
 }
-function setCur(c){if(!validCur(c))return;S.cc=c;S.home=c;S.bcc=c;nfc={};if(S.demo)reseedDemo();save();render();}
+function setCur(c){if(!validCur(c))return;S.cc=c;S.home=c;S.bcc=c;nfc={};if(S.demo)reseedDemo();migrate(S);save();render();}
 
 /* ================= cálculos ================= */
 function inMonth(m,k){return m.date.slice(0,7)===k;}
@@ -685,9 +703,9 @@ function sanitize(raw){
   var cc=validCur(o.cc)?o.cc:(LEGACY_CUR[o.cur]||S.cc);
   var recur=(Array.isArray(o.recur)?o.recur:[]).filter(function(r){return r&&(r.type==='Gasto'||r.type==='Ingreso')&&isFinite(Number(r.amount))&&Number(r.day)>=1;}).map(function(r){return {id:cleanId(r.id),type:r.type,cat:CATS.indexOf(r.cat)>=0?r.cat:'Otro',desc:String(r.desc||'').slice(0,80),amount:Number(r.amount),cc:validCur(r.cc)?r.cc:undefined,day:Math.min(31,Math.max(1,Math.round(Number(r.day)))),next:/^\d{4}-\d{2}$/.test(String(r.next))?r.next:'',prior:r.prior?true:undefined,fromSav:r.fromSav?true:undefined};});
   var rh=o.remind?Number(o.remind.hour):NaN,remind=o.remind&&typeof o.remind==='object'?{on:!!o.remind.on,hour:isFinite(rh)?Math.min(23,Math.max(0,Math.round(rh))):20}:undefined;
-  var wallets=(Array.isArray(o.wallets)?o.wallets:[]).filter(function(w){return w&&w.name;}).map(function(w){return {id:cleanId(w.id),name:String(w.name).slice(0,30),cc:validCur(w.cc)?w.cc:cc,initial:Number(w.initial)||0};});
+  var wallets=(Array.isArray(o.wallets)?o.wallets:[]).filter(function(w){return w&&w.name;}).map(function(w){return {id:cleanId(w.id),name:String(w.name).slice(0,30),cc:validCur(w.cc)?w.cc:cc,initial:Number(w.initial)||0,main:w.main?true:undefined,cash:w.cash?true:undefined};});
   var wids=wallets.map(function(w){return w.id;});
-  var xfers=(Array.isArray(o.xfers)?o.xfers:[]).filter(function(x){return x&&okDate.test(String(x.date))&&isFinite(Number(x.amount))&&wids.indexOf(cleanId(x.from))>=0&&wids.indexOf(cleanId(x.to))>=0;}).map(function(x){return {id:cleanId(x.id),date:x.date,from:cleanId(x.from),to:cleanId(x.to),amount:Number(x.amount)};});
+  var xfers=(Array.isArray(o.xfers)?o.xfers:[]).filter(function(x){return x&&okDate.test(String(x.date))&&isFinite(Number(x.amount))&&wids.indexOf(cleanId(x.from))>=0&&wids.indexOf(cleanId(x.to))>=0;}).map(function(x){return {id:cleanId(x.id),date:x.date,from:cleanId(x.from),to:cleanId(x.to),amount:Number(x.amount),kind:x.kind==='retiro'||x.kind==='deposito'?x.kind:undefined,fee:Number(x.fee)>0?Number(x.fee):undefined};});
   var res={tour:o.tour?true:undefined,wallets:wallets,xfers:xfers,cats:cats,recur:recur,remind:remind,lang:validLang(o.lang)?o.lang:LANG,cc:cc,home:validCur(o.home)?o.home:undefined,bcc:validCur(o.bcc)?o.bcc:undefined,demo:false,seen:true,moves:moves,budgets:budgets,goals:goals,debts:debts,quicks:quicks};
   migrate(res);return res;
 }
@@ -771,7 +789,7 @@ function vResumen(){
   var hasB=S.cc===BC()&&CATS.some(function(c){return S.budgets[c];});
   h+='<div class="grid two" style="margin-top:12px"><section class="card"><h2>'+t('Presupuesto')+' <small>'+monthLabel(k)+'</small></h2>'
     +(hasB?'<div class="bars">'+budgetRows(k,true)+'</div>':'<p class="empty">'+t('Define límites por categoría en la sección Presupuesto.')+'</p>')+'</section>';
-  var recent=S.moves.filter(function(m){return mc(m)===S.cc;}).sort(function(a,b){return b.date.localeCompare(a.date);}).slice(0,5);
+  var recent=S.moves.filter(function(m){return mc(m)===S.cc&&wf(m);}).sort(function(a,b){return b.date.localeCompare(a.date);}).slice(0,5);
   h+='<section class="card"><h2>'+t('Últimos movimientos')+'</h2>'+(recent.length?'<div class="list" style="border:0;border-radius:0">'+recent.map(moveRow).join('')+'</div>':'<p class="empty">'+t('Registra tu primer movimiento con el botón “Nuevo”.')+'</p>')+'</section></div>';
   return h;
 }
@@ -790,7 +808,7 @@ function moveRow(m){
 function movList(){
   var q=(ui.q||'').trim().toLowerCase(),fc=ui.fcat||'',all=!!(q||fc);
   var list=S.moves.filter(function(m){
-    if(mc(m)!==S.cc)return false;
+    if(mc(m)!==S.cc||!wf(m))return false;
     if(!all&&!inMonth(m,ui.month))return false;
     if(ui.filter!=='Todos'&&m.type!==ui.filter)return false;
     if(fc&&m.cat!==fc)return false;
@@ -826,16 +844,32 @@ var WSUG={PEN:['Yape','Plin','BCP','Interbank','BBVA','Scotiabank'],MXN:['Mercad
 function wSug(cc){return [t('Efectivo'),t('Banco'),t('Tarjeta')].concat(WSUG[cc]||[]);}
 function walletOf(id){return (S.wallets||[]).filter(function(w){return w.id===id;})[0];}
 function wallets(cc){return (S.wallets||[]).filter(function(w){return w.cc===cc;});}
-function wBal(w){
+function mainWallet(cc){var ws=wallets(cc);return ws.filter(function(w){return w.main;})[0]||ws[0];}
+function cashWallet(cc){
+  var ws=wallets(cc),c=ws.filter(function(w){return w.cash;})[0];
+  if(!c){c=ws.filter(function(w){return /^(efectivo|cash|dinheiro|esp[eè]ces|bargeld|contanti)$/i.test(w.name);})[0];if(c)c.cash=true;}
+  return c;
+}
+function wBal(w){   /* saldo: lo que hay en la billetera (el ahorro sigue dentro, apartado) */
   var b=w.initial||0;
-  S.moves.forEach(function(m){if(m.w!==w.id)return;b+=m.type==='Ingreso'?m.amount:-m.amount;});
+  S.moves.forEach(function(m){if(m.w!==w.id||m.type==='Ahorro')return;b+=m.type==='Ingreso'?m.amount:-m.amount;});
   (S.xfers||[]).forEach(function(x){if(x.from===w.id)b-=x.amount;if(x.to===w.id)b+=x.amount;});
   return b;
 }
-function walletSel(sel){
-  var ws=S.wallets||[];if(!ws.length)return '';
-  return '<label class="f full"><span>'+t('Billetera')+'</span><select name="wallet"><option value="">'+esc(t('Sin billetera'))+'</option>'+ws.map(function(w){return '<option value="'+esc(w.id)+'" data-cc="'+w.cc+'"'+(w.id===sel?' selected':'')+'>'+esc(w.name)+' ('+w.cc+')</option>';}).join('')+'</select></label>';
+function wSaved(w){var s=0;S.moves.forEach(function(m){if(m.w!==w.id)return;if(m.type==='Ahorro')s+=m.amount;else if(m.fromSav)s-=m.amount;});return Math.max(0,s);}
+function wDisp(w){return wBal(w)-wSaved(w);}
+function walBar(){
+  if(ui.view!=='resumen'&&ui.view!=='movimientos')return '';
+  var ws=wallets(S.cc);if(ws.length<2){ui.wal=null;return '';}
+  if(ui.wal&&!ws.some(function(w){return w.id===ui.wal;}))ui.wal=null;
+  return '<div class="chips" role="group" aria-label="'+esc(t('Billetera'))+'"><button class="chip" data-a="wal" data-v="" aria-pressed="'+(!ui.wal)+'">'+t('Todas')+'</button>'+ws.map(function(w){return '<button class="chip" data-a="wal" data-v="'+esc(w.id)+'" aria-pressed="'+(ui.wal===w.id)+'">'+esc(w.name)+'</button>';}).join('')+'</div>';
 }
+function walletOpts(list,def){return list.map(function(w){return '<option value="'+esc(w.id)+'" data-cc="'+w.cc+'"'+(w.id===def?' selected':'')+'>'+esc(w.name)+' ('+w.cc+')'+(w.main?' ★':'')+'</option>';}).join('');}
+function walletSel(sel,cc){
+  var ws=S.wallets||[],def=sel&&walletOf(sel)?sel:((mainWallet(cc||S.cc)||ws[0]||{}).id);
+  return '<label class="f full"><span>'+t('Billetera')+'</span><select name="wallet" required>'+walletOpts(ws,def)+'</select></label>';
+}
+function walletSelCc(cc){var ws=wallets(cc);return '<label class="f"><span>'+t('Billetera')+'</span><select name="wallet" required>'+walletOpts(ws,(mainWallet(cc)||{}).id)+'</select></label>';}
 var WROW='display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;padding:12px 14px;border:0;border-bottom:1px solid var(--line);background:none;color:inherit;font:inherit;text-align:left;';
 function walletsCard(){
   var ws=wallets(S.cc);if(!ws.length)return '';
@@ -843,13 +877,12 @@ function walletsCard(){
   return '<section class="card" style="margin-top:12px"><h2>'+t('Mis billeteras')+' <small>'+money(tot)+'</small></h2>'+ws.map(function(w){var b=wBal(w);return '<div style="'+WROW+'"><span>'+esc(w.name)+'</span><span class="num '+(b<0?'c-exp':'')+'">'+money(b)+'</span></div>';}).join('')+'<button class="btn alt sm" data-a="nav" data-v="billeteras" style="margin-top:10px">'+t('Billeteras')+'</button></section>';
 }
 function vBilleteras(){
-  var ws=wallets(S.cc),tot=ws.reduce(function(a,w){return a+wBal(w);},0);
-  var h='<div class="actions" style="margin:6px 0 12px"><button class="btn sm" data-a="w-new">+ '+t('Nueva billetera')+'</button>'+(ws.length>1?'<button class="btn alt sm" data-a="x-new">'+t('Transferir')+'</button>':'')+'</div>';
-  if(!ws.length)return h+'<div class="card"><p class="empty">'+t('Aún no tienes billeteras. Crea una para ver dónde está tu dinero.')+'</p></div>';
-  h+='<div class="grid stats">'+statTile(t('Total en billeteras'),money(tot),t('Solo cuentan los movimientos donde elegiste una billetera.'),tot<0?'c-exp':'',true)+'</div>';
-  h+='<div class="card" style="padding:0;margin-top:12px;overflow:hidden">'+ws.map(function(w){var b=wBal(w);return '<button style="'+WROW+'cursor:pointer" data-a="w-edit" data-id="'+esc(w.id)+'"><span>'+esc(w.name)+'</span><span class="num '+(b<0?'c-exp':'')+'">'+money(b)+'</span></button>';}).join('')+'</div>';
+  var ws=wallets(S.cc),tot=ws.reduce(function(a,w){return a+wBal(w);},0),dis=ws.reduce(function(a,w){return a+wDisp(w);},0);
+  var h='<div class="actions" style="margin:6px 0 12px"><button class="btn sm" data-a="w-new">+ '+t('Nueva billetera')+'</button>'+(ws.length>1?'<button class="btn alt sm" data-a="x-new">'+t('Transferir')+'</button>':'')+(ws.some(function(w){return !w.cash;})?'<button class="btn alt sm" data-a="cash-new">'+t('Retirar o depositar efectivo')+'</button>':'')+'</div>';
+  h+='<div class="grid stats" style="grid-template-columns:repeat(2,minmax(0,1fr))">'+statTile(t('Total en billeteras'),money(tot),t('Solo cuentan los movimientos donde elegiste una billetera.'),tot<0?'c-exp':'',true)+statTile(t('Disponible'),money(dis),t('Saldo menos lo apartado para ahorros.'),dis<0?'c-exp':'c-sav')+'</div>';
+  h+='<div class="card" style="padding:0;margin-top:12px;overflow:hidden">'+ws.map(function(w){var b=wBal(w),sv=wSaved(w),dp=b-sv;return '<button style="'+WROW+'cursor:pointer" data-a="w-edit" data-id="'+esc(w.id)+'"><span><b>'+esc(w.name)+'</b>'+(w.main?' ★':'')+'<br><small style="color:var(--muted)">'+t('Saldo')+' '+money(b)+(sv?' · '+t('Apartado')+' '+money(sv):'')+'</small></span><span class="num '+(dp<0?'c-exp':'')+'">'+money(dp)+'</span></button>';}).join('')+'</div>';
   var xs=(S.xfers||[]).filter(function(x){var a=walletOf(x.from);return a&&a.cc===S.cc;}).sort(function(a,b){return b.date.localeCompare(a.date);}).slice(0,8);
-  if(xs.length)h+='<section class="card" style="margin-top:12px"><h2>'+t('Transferencias recientes')+'</h2>'+xs.map(function(x){var a=walletOf(x.from),b=walletOf(x.to);return '<div style="display:flex;justify-content:space-between;gap:8px;padding:6px 0;font-size:14px"><span>'+x.date+' · '+esc(a?a.name:'?')+' → '+esc(b?b.name:'?')+'</span><span class="num">'+money(x.amount)+'</span></div>';}).join('')+'</section>';
+  if(xs.length)h+='<section class="card" style="margin-top:12px"><h2>'+t('Transferencias recientes')+'</h2>'+xs.map(function(x){var a=walletOf(x.from),b=walletOf(x.to),lb=x.kind==='retiro'?t('Retiro'):x.kind==='deposito'?t('Depósito'):'';return '<div style="display:flex;justify-content:space-between;gap:8px;padding:6px 0;font-size:14px"><span>'+x.date+' · '+(lb?lb+' · ':'')+esc(a?a.name:'?')+' → '+esc(b?b.name:'?')+'</span><span class="num">'+money(x.amount)+'</span></div>';}).join('')+'</section>';
   return h;
 }
 function nextKey(k){var p=k.split('-'),d=new Date(+p[0],+p[1],1);return d.getFullYear()+'-'+pad(d.getMonth()+1);}
@@ -864,7 +897,7 @@ function genRecur(){
       var p=r.next.split('-'),dim=new Date(+p[0],+p[1],0).getDate(),date=r.next+'-'+pad(Math.min(r.day||1,dim));
       if(date>today)break;
       if(!S.moves.some(function(m){return m.rid===r.id&&m.date===date;})){
-        var mv={id:uid(),date:date,type:r.type,cat:r.cat,desc:r.desc||'',amount:r.amount,note:'',cc:r.cc,rid:r.id};
+        var mv={id:uid(),date:date,type:r.type,cat:r.cat,desc:r.desc||'',amount:r.amount,note:'',cc:r.cc,rid:r.id,w:(r.w&&walletOf(r.w)?r.w:(mainWallet(r.cc||S.cc)||{}).id)};
         if(r.prior)mv.prior=true;if(r.fromSav)mv.fromSav=true;
         S.moves.push(mv);n++;
       }
@@ -880,7 +913,7 @@ function compareHTML(k,gas){
 }
 function budgetAlertHTML(){
   if(S.cc!==BC())return '';
-  var sp=spentByCat(curMonth()),items=[];
+  var sw=ui.wal;ui.wal=null;var sp=spentByCat(curMonth()),items=[];ui.wal=sw;
   CATS.forEach(function(c){var lim=S.budgets[c];if(!lim)return;var pc=(sp[c]||0)/lim*100;
     if(pc>=100)items.push(t('{name}: te pasaste del límite',{name:esc(cname(c))}));
     else if(pc>=80)items.push(t('{name}: llevas el {p}% de tu límite',{name:esc(cname(c)),p:Math.round(pc)}));});
@@ -1072,9 +1105,9 @@ function sheetHTML(){
     var m=s.id?S.moves.filter(function(x){return x.id===s.id;})[0]:{type:s.type||'Gasto',date:iso(new Date())};
     h='<h2>'+t(s.id?K('Editar movimiento'):K('Nuevo movimiento'))+'</h2><form data-kind="move"><div class="seg" role="radiogroup" aria-label="'+esc(t('Tipo'))+'">'
       +TYPES.map(function(tp){return '<div><input type="radio" name="type" id="t-'+tp+'" value="'+tp+'"'+(m.type===tp?' checked':'')+'><label for="t-'+tp+'">'+t(tp)+'</label></div>';}).join('')+'</div>'
-      +'<div class="fgrid" style="margin-top:14px"><label class="f"><span data-amtl>'+t('Monto ({c})',{c:esc(curSym(m.cc||S.cc))})+'</span><input id="f-amt" name="amount" inputmode="decimal" required placeholder="0.00" value="'+(m.amount!=null?m.amount:'')+'"></label>'
+      +'<div class="fgrid" style="margin-top:14px"><label class="f"><span data-amtl>'+t('Monto ({c})',{c:esc(curSym((walletOf(m.w)||mainWallet(m.cc||S.cc)||{}).cc||m.cc||S.cc))})+'</span><input id="f-amt" name="amount" inputmode="decimal" required placeholder="0.00" value="'+(m.amount!=null?m.amount:'')+'"></label>'
       +'<label class="f"><span>'+t('Fecha')+'</span><input id="f-date" type="date" name="date" required value="'+m.date+'"></label>'
-      +ccField(m.cc)+walletSel(m.w)
+      +walletSel(m.w,m.cc)
       +'<div class="full" id="dyn" style="display:contents">'+moveFields(m.type,m)+'</div>'
       +'<label class="f full"><span>'+t('Descripción')+'</span><input id="f-desc" name="desc" placeholder="'+esc(t('Ej. Desayuno, pago semanal'))+'" value="'+esc(m.desc||'')+'"></label>'
       +'<label class="f full"><span>'+t('Notas (opcional)')+'</span><input id="f-note" name="note" value="'+esc(m.note||'')+'"></label></div>'
@@ -1123,6 +1156,7 @@ function sheetHTML(){
     var dflt=isG?'':(dKind(ent)==='unico'?(Math.max(0,ent.total-debtPaid(ent))||''):(ent.monthly||''));
     h='<h2>'+t(isG?K('Aportar a “{name}”'):K('Pago de “{name}”'),{name:esc(ent.name)})+'</h2><form data-kind="quick"><div class="fgrid"><label class="f"><span data-amtl>'+t('Monto ({c})',{c:esc(curSym(mc(ent)))})+'</span><input id="q-amt" name="amount" inputmode="decimal" required value="'+dflt+'"></label>'
       +'<label class="f"><span>'+t('Fecha')+'</span><input id="q-date" type="date" name="date" required value="'+iso(new Date())+'"></label></div>'
+      +'<div style="margin-top:12px">'+walletSelCc(mc(ent))+'</div>'
       +(isG?'<label class="f" style="margin-top:12px"><span>'+t('¿De dónde viene?')+'</span><select id="q-origin" name="origin"><option value="">'+t('De mis ingresos de este mes')+'</option><option value="prior">'+t('Ya lo tenía ahorrado')+'</option></select></label>':'<div style="margin-top:12px">'+debtOrigin(null,'q-origin')+'</div>')
       +'<p class="note">'+t(isG?K('Se guarda también como movimiento de ahorro.'):K('Se guarda también como movimiento de pago de deuda.'))+'</p><div class="foot"><button class="btn grow" type="submit">'+t('Guardar')+'</button><button class="btn alt" type="button" data-a="close">'+t('Cancelar')+'</button></div></form>';
   }else if(s.kind==='quicks'){
@@ -1167,8 +1201,19 @@ function sheetHTML(){
     h='<h2>'+t(s.id?K('Editar billetera'):K('Nueva billetera'))+'</h2><form data-kind="wallet"><div class="fgrid">'
       +'<label class="f full"><span>'+t('Nombre de la billetera')+'</span><input id="w-name" name="name" list="w-sug" required maxlength="30" autocomplete="off" value="'+esc(w0.name||'')+'"><datalist id="w-sug">'+wSug(w0.cc).map(function(n){return '<option value="'+esc(n)+'">';}).join('')+'</datalist></label>'
       +'<label class="f full"><span>'+t('Moneda')+'</span><select id="w-cc" name="cc"'+(s.id?' disabled':'')+'>'+curOptions(w0.cc||S.cc)+'</select></label>'
-      +'<label class="f full"><span>'+t('Saldo inicial')+'</span><input name="initial" inputmode="decimal" placeholder="0.00" value="'+(w0.initial||'')+'"></label></div>'
+      +'<label class="f full"><span>'+t('Saldo inicial')+'</span><input name="initial" inputmode="decimal" placeholder="0.00" value="'+(w0.initial||'')+'"></label>'
+      +'<label class="f full" style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" name="main" style="width:auto"'+(w0.main?' checked':'')+'><span>'+t('Usar como billetera principal')+'</span></label>'
+      +'<label class="f full" style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" name="cash" style="width:auto"'+(w0.cash?' checked':'')+'><span>'+t('Es mi billetera de efectivo')+'</span></label></div>'
       +'<div class="foot"><button class="btn grow" type="submit">'+t('Guardar')+'</button><button class="btn alt" type="button" data-a="close">'+t('Cancelar')+'</button>'+(s.id?'<button class="btn danger" type="button" data-a="del">'+t('Eliminar')+'</button>':'')+'</div></form>';
+  }else if(s.kind==='cash'){
+    var dig=wallets(S.cc).filter(function(w){return !w.cash;});
+    h='<h2>'+t('Retirar o depositar efectivo')+'</h2><form data-kind="cash"><div class="fgrid">'
+      +'<label class="f full"><span>'+t('Operación')+'</span><select name="op"><option value="retiro">'+t('Retirar efectivo')+'</option><option value="deposito">'+t('Depositar efectivo')+'</option></select></label>'
+      +'<label class="f full"><span>'+t('Billetera digital')+'</span><select name="dig">'+walletOpts(dig,(mainWallet(S.cc)||{}).id)+'</select></label>'
+      +'<label class="f"><span>'+t('Monto ({c})',{c:esc(curSym(S.cc))})+'</span><input name="amount" inputmode="decimal" required placeholder="0.00"></label>'
+      +'<label class="f"><span>'+t('Comisión (opcional)')+'</span><input name="fee" inputmode="decimal" placeholder="0.00"></label>'
+      +'<label class="f full"><span>'+t('Fecha')+'</span><input type="date" name="date" required value="'+iso(new Date())+'"></label></div>'
+      +'<div class="foot"><button class="btn grow" type="submit">'+t('Guardar')+'</button><button class="btn alt" type="button" data-a="close">'+t('Cancelar')+'</button></div></form>';
   }else if(s.kind==='xfer'){
     var ws2=wallets(S.cc),wo=ws2.map(function(w,i){return '<option value="'+esc(w.id)+'"'+(i===0?' selected':'')+'>'+esc(w.name)+'</option>';}).join(''),wo2=ws2.map(function(w,i){return '<option value="'+esc(w.id)+'"'+(i===1?' selected':'')+'>'+esc(w.name)+'</option>';}).join('');
     h='<h2>'+t('Transferir entre billeteras')+'</h2><form data-kind="xfer"><div class="fgrid">'
@@ -1189,7 +1234,7 @@ function sheetHTML(){
 
 /* ================= render ================= */
 function render(){
-  applyCats();if(genRecur())save();
+  applyCats();migrate(S);if(genRecur())save();
   document.documentElement.lang=LANG;
   var nav=NAV.map(function(n){return '<button class="nav-btn" data-a="nav" data-v="'+n[0]+'"'+(ui.view===n[0]?' aria-current="page"':'')+'><svg viewBox="0 0 24 24" aria-hidden="true">'+n[2]+'</svg><span>'+t(n[1])+'</span></button>';}).join('');
   document.getElementById('side').innerHTML='<div class="brand"><i></i>Plata Clara</div>'+nav;
@@ -1199,7 +1244,7 @@ function render(){
   document.getElementById('mi-acc').textContent=t('Mi cuenta');document.getElementById('mi-lang').textContent=t('Idioma');document.getElementById('mi-set').textContent=t('Ajustes');document.getElementById('mi-soc').textContent=t('Síguenos');document.getElementById('b-soc').hidden=!(socials().length||((window.PC_CONFIG||{}).CONTACT_URL));
   document.getElementById('banner').innerHTML=S.demo?'<div class="banner"><span>'+t('<b>Estás viendo datos de ejemplo.</b> Pruébalos y, cuando quieras, empieza con los tuyos.')+'</span><button class="btn sm" data-a="clearall">'+t('Empezar con mis datos')+'</button></div>':'';
   if(ui.view==='metas')ui.view='ahorros';
-  var v=curBar()+{resumen:vResumen,movimientos:vMovs,presupuesto:vPresu,ahorros:vAhorros,metas:vMetas,deudas:vDeudas,billeteras:vBilleteras}[ui.view]();
+  var v=curBar()+walBar()+{resumen:vResumen,movimientos:vMovs,presupuesto:vPresu,ahorros:vAhorros,metas:vMetas,deudas:vDeudas,billeteras:vBilleteras}[ui.view]();
   if(ui.view==='movimientos'||ui.view==='resumen')v+='<button class="btn fab" data-a="new">'+t('+ Nuevo')+'</button>';
   document.getElementById('view').innerHTML=v;
   var sh=document.getElementById('sheet');
@@ -1288,11 +1333,13 @@ document.addEventListener('click',function(e){
   else if(a==='settings'){ui.sheet={kind:'settings',noFocus:true};render();}
   else if(a==='region'){ui.sheet={kind:'region',noFocus:true};render();}
   else if(a==='cur'){setBase(el.dataset.v);}
-  else if(a==='qtap'){var q=S.quicks.filter(function(x){return x.id===id;})[0];if(q){var mv={id:uid(),date:iso(new Date()),type:q.type,cat:q.cat,desc:q.name,amount:q.amount,note:'',cc:mc(q)};S.moves.push(mv);ui.month=mv.date.slice(0,7);save();render();toast(t('{name} anotado',{name:q.name}),mv.id);}}
+  else if(a==='qtap'){var q=S.quicks.filter(function(x){return x.id===id;})[0];if(q){var mv={id:uid(),date:iso(new Date()),type:q.type,cat:q.cat,desc:q.name,amount:q.amount,note:'',cc:mc(q),w:(mainWallet(mc(q))||{}).id};S.moves.push(mv);ui.month=mv.date.slice(0,7);save();render();toast(t('{name} anotado',{name:q.name}),mv.id);}}
   else if(a==='social'){ui.sheet={kind:'social',noFocus:true};render();}
   else if(a==='coach-next'){if(coachI>=COACH.length-1)coachEnd();else{coachI++;coachShow();}}
   else if(a==='coach-prev'){if(coachI>0){coachI--;coachShow();}}
   else if(a==='coach-skip'){coachEnd();}
+  else if(a==='wal'){ui.wal=el.dataset.v||null;render();}
+  else if(a==='cash-new'){ui.sheet={kind:'cash',noFocus:true};render();}
   else if(a==='w-new'){ui.sheet={kind:'wallet'};render();}
   else if(a==='w-edit'){ui.sheet={kind:'wallet',id:id};render();}
   else if(a==='x-new'){ui.sheet={kind:'xfer',noFocus:true};render();}
@@ -1322,7 +1369,7 @@ document.addEventListener('click',function(e){
     if(!el.dataset.armed){el.dataset.armed='1';el.textContent=t('Toca otra vez para eliminar');return;}
     var s=ui.sheet;
     if(s.kind==='move')S.moves=S.moves.filter(function(m){return m.id!==s.id;});
-    if(s.kind==='wallet'){S.wallets=S.wallets.filter(function(w){return w.id!==s.id;});S.moves.forEach(function(m){if(m.w===s.id)delete m.w;});S.xfers=(S.xfers||[]).filter(function(x){return x.from!==s.id&&x.to!==s.id;});}
+    if(s.kind==='wallet'){S.wallets=S.wallets.filter(function(w){return w.id!==s.id;});S.moves.forEach(function(m){if(m.w===s.id)delete m.w;});S.xfers=(S.xfers||[]).filter(function(x){return x.from!==s.id&&x.to!==s.id;});migrate(S);}
     if(s.kind==='goal'){S.goals=S.goals.filter(function(g){return g.id!==s.id;});S.moves.forEach(function(m){if(m.goalId===s.id)delete m.goalId;});}
     if(s.kind==='debt'){S.debts=S.debts.filter(function(d){return d.id!==s.id;});S.moves.forEach(function(m){if(m.debtId===s.id)delete m.debtId;});}
     save();closeSheet();toast(t('Eliminado'));
@@ -1333,7 +1380,7 @@ document.addEventListener('click',function(e){
 document.addEventListener('change',function(e){
   var tg=e.target;
   if(tg.id==='mcat'){ui.fcat=tg.value;render();return;}
-  if(tg.name==='wallet'){var op=tg.options[tg.selectedIndex],wcc=op&&op.getAttribute('data-cc');if(wcc){var fm3=tg.closest('form'),sc=fm3&&fm3.querySelector('select[name=cc]');if(sc){sc.value=wcc;var al3=fm3.querySelector('[data-amtl]');if(al3)al3.textContent=t('Monto ({c})',{c:curSym(wcc)});}}return;}
+  if(tg.name==='wallet'){var op=tg.options[tg.selectedIndex],wcc=op&&op.getAttribute('data-cc');if(wcc){var fm3=tg.closest('form'),al3=fm3&&fm3.querySelector('[data-amtl]');if(al3)al3.textContent=t('Monto ({c})',{c:curSym(wcc)});}return;}
   if(tg.id==='w-cc'){var dl=document.getElementById('w-sug');if(dl)dl.innerHTML=wSug(tg.value).map(function(n){return '<option value="'+esc(n)+'">';}).join('');return;}
   if(tg.id==='rm-on'||tg.id==='rm-hr'){var on=document.getElementById('rm-on').checked,hr=+document.getElementById('rm-hr').value;S.remind={on:on,hour:isFinite(hr)?hr:20};save();toast(t(on?'Recordatorio activado':'Recordatorio desactivado'));return;}
   if(tg.id==='r-file'&&tg.files&&tg.files[0]){readBackup(tg.files[0]);return;}
@@ -1360,11 +1407,11 @@ document.addEventListener('submit',function(e){
     stampFx(rec,d.cc,prevM);
     var lk=rec.goalId?S.goals.filter(function(x){return x.id===rec.goalId;})[0]:rec.debtId?S.debts.filter(function(x){return x.id===rec.debtId;})[0]:null;
     if(lk)rec.cc=mc(lk);   /* los aportes y pagos usan la moneda de su meta o deuda */
-    var wsel=d.wallet?walletOf(d.wallet):null;
+    var wsel=(d.wallet?walletOf(d.wallet):null)||mainWallet(rec.cc||S.cc);
     if(wsel){if(lk&&mc(lk)!==wsel.cc){toast(t('La billetera y la meta o deuda deben usar la misma moneda.'));return;}rec.cc=wsel.cc;rec.w=wsel.id;}
     if(s.id)S.moves=S.moves.map(function(m){return m.id===s.id?rec:m;});else S.moves.push(rec);
     if(d.asquick&&!s.id&&(d.type==='Gasto'||d.type==='Ingreso')&&rec.desc)S.quicks.push({id:uid(),name:rec.desc,type:d.type,cat:rec.cat,amount:rec.amount,cc:rec.cc});
-    if(d.repeat&&!s.id&&(d.type==='Gasto'||d.type==='Ingreso')){S.recur=S.recur||[];S.recur.push({id:uid(),type:d.type,cat:rec.cat,desc:rec.desc,amount:rec.amount,cc:rec.cc,day:+rec.date.slice(8,10)||1,next:nextKey(rec.date.slice(0,7)),prior:rec.prior||undefined,fromSav:rec.fromSav||undefined});}
+    if(d.repeat&&!s.id&&(d.type==='Gasto'||d.type==='Ingreso')){S.recur=S.recur||[];S.recur.push({id:uid(),type:d.type,cat:rec.cat,desc:rec.desc,amount:rec.amount,cc:rec.cc,w:rec.w,day:+rec.date.slice(8,10)||1,next:nextKey(rec.date.slice(0,7)),prior:rec.prior||undefined,fromSav:rec.fromSav||undefined});}
     ui.month=rec.date.slice(0,7);msg=t(d.asquick&&!s.id?K('Movimiento y atajo guardados'):K('Movimiento guardado'));
   }else if(k==='goal'){
     var gr={id:s.id||uid(),name:d.name.trim(),target:num(d.target),initial:num(d.initial),date:d.date||'',cc:validCur(d.cc)?d.cc:S.cc,kind:d.kind==='ext'?'ext':'own',owner:d.kind==='ext'?(d.owner||'').trim().slice(0,60):''};
@@ -1390,9 +1437,18 @@ document.addEventListener('submit',function(e){
   }else if(k==='wallet'){
     var wn=(d.name||'').trim().slice(0,30);if(!wn)return;
     S.wallets=S.wallets||[];
-    if(s.id)S.wallets=S.wallets.map(function(w){return w.id===s.id?{id:w.id,name:wn,cc:w.cc,initial:num(d.initial)}:w;});
-    else S.wallets.push({id:uid(),name:wn,cc:validCur(d.cc)?d.cc:S.cc,initial:num(d.initial)});
+    var wcc2=s.id?walletOf(s.id).cc:(validCur(d.cc)?d.cc:S.cc),wnew={id:s.id||uid(),name:wn,cc:wcc2,initial:num(d.initial),main:!!d.main,cash:!!d.cash};
+    if(wnew.main)S.wallets.forEach(function(w){if(w.cc===wcc2)w.main=false;});
+    if(s.id)S.wallets=S.wallets.map(function(w){return w.id===s.id?wnew:w;});else S.wallets.push(wnew);
     msg=t('Billetera guardada');
+  }else if(k==='cash'){
+    var ca=num(d.amount);if(ca<=0){toast(t('Escribe un monto mayor que cero'));return;}
+    var dw=walletOf(d.dig);if(!dw||dw.cash){toast(t('Elige una billetera digital.'));return;}
+    var cw=cashWallet(dw.cc);if(!cw){cw={id:uid(),name:t('Efectivo'),cc:dw.cc,initial:0,cash:true};S.wallets.push(cw);}
+    var ret=d.op!=='deposito',fromW=ret?dw:cw,toW=ret?cw:dw,fee=Math.max(0,num(d.fee)),xid=uid();
+    S.xfers=S.xfers||[];S.xfers.push({id:xid,date:d.date,from:fromW.id,to:toW.id,amount:Math.round(ca*100)/100,kind:ret?'retiro':'deposito',fee:fee||undefined});
+    if(fee>0)S.moves.push({id:uid(),date:d.date,type:'Gasto',cat:'Otro',desc:t(ret?'Comisión de retiro':'Comisión de depósito'),amount:Math.round(fee*100)/100,note:'',cc:fromW.cc,w:fromW.id,xid:xid});
+    msg=t('Operación guardada');
   }else if(k==='xfer'){
     var xa=num(d.amount);if(xa<=0){toast(t('Escribe un monto mayor que cero'));return;}
     var wa=walletOf(d.from),wb=walletOf(d.to);
@@ -1411,6 +1467,9 @@ document.addEventListener('submit',function(e){
     if(isG)mv2.goalId=ent.id;else mv2.debtId=ent.id;
     if(d.origin==='prior')mv2.prior=true;
     if(!isG&&d.origin==='ahorro'){mv2.prior=true;mv2.fromSav=true;}
+    var qw=(d.wallet?walletOf(d.wallet):null)||mainWallet(mc(ent));
+    if(qw&&qw.cc!==mc(ent)){toast(t('La billetera y la meta o deuda deben usar la misma moneda.'));return;}
+    if(qw)mv2.w=qw.id;
     stampFx(mv2,mc(ent),null);S.moves.push(mv2);msg=t(isG?K('Aporte registrado'):K('Pago registrado'));
   }
   save();ui.sheet=null;render();if(msg)toast(msg);
