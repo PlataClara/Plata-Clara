@@ -322,6 +322,8 @@ Object.keys(N).forEach(function(l){DICT[l]=DICT[l]||{};for(var k in N[l])DICT[l]
 Object.keys(N).forEach(function(l){DICT[l]=DICT[l]||{};for(var k in N[l])DICT[l][k]=N[l][k];});})();
 (function(){var N={"en": {"Editar ahorro": "Edit saving", "Nuevo pago de deuda": "New debt payment", "Editar pago de deuda": "Edit debt payment", "Con “+ Nuevo” registras un ingreso o un gasto. Los ahorros y las deudas se anotan en sus propias pestañas.": "With “+ New” you record income or an expense. Savings and debts go in their own tabs."}, "pt": {"Editar ahorro": "Editar poupança", "Nuevo pago de deuda": "Novo pagamento de dívida", "Editar pago de deuda": "Editar pagamento de dívida", "Con “+ Nuevo” registras un ingreso o un gasto. Los ahorros y las deudas se anotan en sus propias pestañas.": "Com “+ Novo” você registra uma renda ou um gasto. Poupanças e dívidas ficam em suas próprias abas."}, "fr": {"Editar ahorro": "Modifier l'épargne", "Nuevo pago de deuda": "Nouveau paiement de dette", "Editar pago de deuda": "Modifier le paiement de dette", "Con “+ Nuevo” registras un ingreso o un gasto. Los ahorros y las deudas se anotan en sus propias pestañas.": "Avec « + Nouveau » vous saisissez un revenu ou une dépense. L'épargne et les dettes ont leurs propres onglets."}, "de": {"Editar ahorro": "Ersparnis bearbeiten", "Nuevo pago de deuda": "Neue Schuldenzahlung", "Editar pago de deuda": "Schuldenzahlung bearbeiten", "Con “+ Nuevo” registras un ingreso o un gasto. Los ahorros y las deudas se anotan en sus propias pestañas.": "Mit „+ Neu“ trägst du Einnahmen oder Ausgaben ein. Ersparnisse und Schulden haben eigene Reiter."}, "it": {"Editar ahorro": "Modifica risparmio", "Nuevo pago de deuda": "Nuovo pagamento del debito", "Editar pago de deuda": "Modifica pagamento del debito", "Con “+ Nuevo” registras un ingreso o un gasto. Los ahorros y las deudas se anotan en sus propias pestañas.": "Con “+ Nuovo” registri un'entrata o una spesa. Risparmi e debiti hanno le loro schede."}};
 Object.keys(N).forEach(function(l){DICT[l]=DICT[l]||{};for(var k in N[l])DICT[l][k]=N[l][k];});})();
+(function(){var N={"en": {"Borrar": "Delete", "¿Borrar esta operación? También se quita su comisión, si tenía.": "Delete this operation? Its fee is also removed, if it had one.", "Operación borrada": "Operation deleted", "Aparta {v} al mes para llegar a tiempo": "Set aside {v} a month to reach it on time", "Plan de pago": "Payment plan", "Paga primero la deuda más chica y, al terminarla, usa esa cuota para la siguiente (método bola de nieve).": "Pay the smallest debt first and, once it is done, use that payment for the next one (snowball method).", "~{n} cuotas": "~{n} installments"}, "pt": {"Borrar": "Apagar", "¿Borrar esta operación? También se quita su comisión, si tenía.": "Apagar esta operação? A taxa dela também é removida, se houver.", "Operación borrada": "Operação apagada", "Aparta {v} al mes para llegar a tiempo": "Reserve {v} por mês para chegar a tempo", "Plan de pago": "Plano de pagamento", "Paga primero la deuda más chica y, al terminarla, usa esa cuota para la siguiente (método bola de nieve).": "Pague primeiro a menor dívida e, ao terminá-la, use essa parcela para a próxima (método bola de neve).", "~{n} cuotas": "~{n} parcelas"}, "fr": {"Borrar": "Supprimer", "¿Borrar esta operación? También se quita su comisión, si tenía.": "Supprimer cette opération ? Ses frais sont aussi retirés, le cas échéant.", "Operación borrada": "Opération supprimée", "Aparta {v} al mes para llegar a tiempo": "Mettez {v} de côté par mois pour y arriver à temps", "Plan de pago": "Plan de paiement", "Paga primero la deuda más chica y, al terminarla, usa esa cuota para la siguiente (método bola de nieve).": "Payez d'abord la plus petite dette puis, une fois soldée, utilisez cette mensualité pour la suivante (méthode boule de neige).", "~{n} cuotas": "~{n} mensualités"}, "de": {"Borrar": "Löschen", "¿Borrar esta operación? También se quita su comisión, si tenía.": "Diesen Vorgang löschen? Eine eventuelle Gebühr wird ebenfalls entfernt.", "Operación borrada": "Vorgang gelöscht", "Aparta {v} al mes para llegar a tiempo": "Lege {v} pro Monat zurück, um rechtzeitig anzukommen", "Plan de pago": "Zahlungsplan", "Paga primero la deuda más chica y, al terminarla, usa esa cuota para la siguiente (método bola de nieve).": "Zahle zuerst die kleinste Schuld und nutze die Rate danach für die nächste (Schneeballmethode).", "~{n} cuotas": "~{n} Raten"}, "it": {"Borrar": "Elimina", "¿Borrar esta operación? También se quita su comisión, si tenía.": "Eliminare questa operazione? Viene rimossa anche la commissione, se c'era.", "Operación borrada": "Operazione eliminata", "Aparta {v} al mes para llegar a tiempo": "Accantona {v} al mese per arrivarci in tempo", "Plan de pago": "Piano di pagamento", "Paga primero la deuda más chica y, al terminarla, usa esa cuota para la siguiente (método bola de nieve).": "Paga prima il debito più piccolo e, una volta estinto, usa quella rata per il successivo (metodo valanga di neve).", "~{n} cuotas": "~{n} rate"}};
+Object.keys(N).forEach(function(l){DICT[l]=DICT[l]||{};for(var k in N[l])DICT[l][k]=N[l][k];});})();
 function K(s){return s;}                    /* marca textos estáticos que se traducen al mostrarlos */
 var LANG='es';
 function t(k,v){
@@ -606,10 +608,11 @@ function niceMax(v){if(v<=0)return 100;var e=Math.pow(10,Math.floor(Math.log10(v
 
 /* ================= atajos, avisos de deudas y respaldo ================= */
 function cleanId(x){return String(x==null?'':x).replace(/[^\w-]/g,'')||uid();}
+function qWallet(q){return (q.w&&walletOf(q.w))||mainWallet(mc(q));}
 function quickBar(){
   var h='<div class="chips" role="group" aria-label="'+esc(t('Atajos para anotar con un toque'))+'">';
   S.quicks.filter(function(q){return mc(q)===S.cc;}).forEach(function(q){
-    h+='<button class="chip" data-a="qtap" data-id="'+q.id+'"><span class="'+(q.type==='Ingreso'?'c-inc':'c-exp')+'">'+(q.type==='Ingreso'?'+':'−')+'</span> '+esc(q.name)+' <span class="num" style="color:var(--muted)">'+money(q.amount)+'</span></button>';
+    h+='<button class="chip" data-a="qtap" data-id="'+q.id+'"><span class="'+(q.type==='Ingreso'?'c-inc':'c-exp')+'">'+(q.type==='Ingreso'?'+':'−')+'</span> '+esc(q.name)+' <span class="num" style="color:var(--muted)">'+money(q.amount)+'</span>'+(wallets(S.cc).length>1&&qWallet(q)?' <small style="color:var(--muted)">· '+esc(qWallet(q).name)+'</small>':'')+'</button>';
   });
   h+='<button class="chip" data-a="qedit">'+t(S.quicks.length?K('Editar atajos'):K('+ Crear atajo'))+'</button></div>';
   return h;
@@ -886,7 +889,7 @@ function vBilleteras(){
   h+='<div class="grid stats">'+statTile(t('Total en billeteras'),money(tot),t('Suma de todas tus billeteras'),tot<0?'c-exp':'',true)+'</div>';
   h+='<div class="card" style="padding:0;margin-top:12px;overflow:hidden">'+ws.map(function(w){var b=wBal(w),sv=wSaved(w);return '<button style="'+WROW+'cursor:pointer" data-a="w-edit" data-id="'+esc(w.id)+'"><span><b>'+esc(w.name)+'</b>'+(w.main?' ★':'')+(sv?'<br><small style="color:var(--muted)">'+t('Apartado')+' '+money(sv)+'</small>':'')+'</span><span class="num '+(b<0?'c-exp':'')+'">'+money(b)+'</span></button>';}).join('')+'</div>';
   var xs=(S.xfers||[]).filter(function(x){var a=walletOf(x.from);return a&&a.cc===S.cc;}).sort(function(a,b){return b.date.localeCompare(a.date);}).slice(0,8);
-  if(xs.length)h+='<section class="card" style="margin-top:12px"><h2>'+t('Transferencias recientes')+'</h2>'+xs.map(function(x){var a=walletOf(x.from),b=walletOf(x.to),lb=x.kind==='retiro'?t('Retiro'):x.kind==='deposito'?t('Depósito'):'';return '<div style="display:flex;justify-content:space-between;gap:8px;padding:6px 0;font-size:14px"><span>'+x.date+' · '+(lb?lb+' · ':'')+esc(a?a.name:'?')+' → '+esc(b?b.name:'?')+'</span><span class="num">'+money(x.amount)+'</span></div>';}).join('')+'</section>';
+  if(xs.length)h+='<section class="card" style="margin-top:12px"><h2>'+t('Transferencias recientes')+'</h2>'+xs.map(function(x){var a=walletOf(x.from),b=walletOf(x.to),lb=x.kind==='retiro'?t('Retiro'):x.kind==='deposito'?t('Depósito'):'';return '<div style="display:flex;justify-content:space-between;gap:8px;padding:6px 0;font-size:14px"><span>'+x.date+' · '+(lb?lb+' · ':'')+esc(a?a.name:'?')+' → '+esc(b?b.name:'?')+'</span><span class="num">'+money(x.amount)+' <button class="btn sm alt" data-a="x-del" data-id="'+esc(x.id)+'" aria-label="'+esc(t('Borrar'))+'">✕</button></span></div>';}).join('')+'</section>';
   return h;
 }
 function nextKey(k){var p=k.split('-'),d=new Date(+p[0],+p[1],1);return d.getFullYear()+'-'+pad(d.getMonth()+1);}
@@ -1001,9 +1004,10 @@ function goalsBlock(){
     var sv=goalSaved(g),pct=Math.min(100,g.target?sv/g.target*100:0),dl=daysUntil(g.date),ext=g.kind==='ext';
     var meta=g.date?t('Para el {date}',{date:dateLong(g.date)})+(dl!=null?' · '+(dl<0?t('venció hace {d}',{d:dias(-dl)}):dias(dl)):''):t('Sin fecha');
     if(ext&&g.owner)meta=t('Meta de {name}',{name:esc(g.owner)})+' · '+meta;
+    var need='';if(g.date&&dl!=null&&dl>=0&&sv<g.target){var mo=Math.max(1,Math.ceil(dl/30.44));need='<p class="note" style="margin:6px 0 0">'+t('Aparta {v} al mes para llegar a tiempo',{v:money((g.target-sv)/mo)})+'</p>';}
     h+='<article class="card item"><h3>'+esc(g.name)+(ext?'<span class="tag ext">'+t('Externa')+'</span>':'')+'</h3><p class="meta">'+meta+'</p>'
      +'<div class="track"><div class="fill sav" style="width:'+pct+'%"></div></div><div class="figs"><span>'+t('Ahorrado')+'<br><b class="num c-sav">'+money(sv)+'</b></span><span style="text-align:right">'+t('Meta')+'<br><b class="num">'+money(g.target)+'</b></span></div>'
-     +'<div class="actions"><button class="btn sm" data-a="contrib" data-id="'+g.id+'">'+t('Aportar')+'</button><button class="btn sm alt" data-a="goal-edit" data-id="'+g.id+'">'+t('Editar')+'</button><span class="num" style="align-self:center;color:var(--muted);font-size:13px">'+Math.round(pct)+'%</span></div></article>';
+     +need+'<div class="actions"><button class="btn sm" data-a="contrib" data-id="'+g.id+'">'+t('Aportar')+'</button><button class="btn sm alt" data-a="goal-edit" data-id="'+g.id+'">'+t('Editar')+'</button><span class="num" style="align-self:center;color:var(--muted);font-size:13px">'+Math.round(pct)+'%</span></div></article>';
   });
   return h+'</div>';
 }
@@ -1059,7 +1063,11 @@ function vDeudas(){
      +debtStatusHTML(d,left)+'<div class="track"><div class="fill dbt" style="width:'+pct+'%"></div></div><div class="figs"><span>'+lblP+'<br><b class="num">'+money(paid)+'</b></span><span style="text-align:right">'+lblL+'<br><b class="num c-debt">'+money(left)+'</b></span></div>'
      +'<div class="actions">'+(done?'':'<button class="btn sm" data-a="pay" data-id="'+d.id+'">'+t('Registrar pago')+'</button>')+'<button class="btn sm alt" data-a="debt-edit" data-id="'+d.id+'">'+t('Editar')+'</button></div></article>';
   });
-  return h+'</div>';
+  h+='</div>';
+  var pl=DS.filter(function(d){return dKind(d)!=='mensual'&&dLeft(d)>0;}).sort(function(x,y){return dLeft(x)-dLeft(y);});
+  if(pl.length>1)h+='<section class="card" style="margin-top:14px"><h2>'+t('Plan de pago')+'</h2><p class="note" style="margin:0 0 8px">'+t('Paga primero la deuda más chica y, al terminarla, usa esa cuota para la siguiente (método bola de nieve).')+'</p>'
+    +pl.map(function(d,i){var l=dLeft(d),n=dKind(d)==='cuotas'&&d.monthly>0?Math.ceil(l/d.monthly):0;return '<div style="display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid var(--line);font-size:14px"><span><b>'+(i+1)+'.</b> '+esc(d.name)+(n?' <small style="color:var(--muted)">· '+t('~{n} cuotas',{n:n})+'</small>':'')+'</span><span class="num">'+money(l)+'</span></div>';}).join('')+'</section>';
+  return h;
 }
 
 /* ================= hojas (formularios) ================= */
@@ -1166,9 +1174,10 @@ function sheetHTML(){
   }else if(s.kind==='quicks'){
     h='<h2>'+t('Atajos')+'</h2><p class="note" style="margin:-6px 0 12px">'+t('Un atajo anota un gasto o ingreso frecuente con un solo toque, con la fecha de hoy.')+'</p>';
     if(!S.quicks.length)h+='<p class="empty">'+t('Aún no tienes atajos. Crea el primero abajo.')+'</p>';
-    else h+='<div class="list" style="margin-bottom:14px">'+S.quicks.map(function(q){return '<div class="row" style="cursor:default"><span class="t"><b>'+esc(q.name)+'</b><small>'+t(q.type)+' · '+cname(q.cat)+' · '+money(q.amount)+'</small></span><button class="btn danger sm" type="button" data-a="qdel" data-id="'+q.id+'">'+t('Quitar')+'</button></div>';}).join('')+'</div>';
+    else h+='<div class="list" style="margin-bottom:14px">'+S.quicks.map(function(q){return '<div class="row" style="cursor:default"><span class="t"><b>'+esc(q.name)+'</b><small>'+t(q.type)+' · '+cname(q.cat)+' · '+money(q.amount)+'</small>'+(wallets(mc(q)).length?'<select data-qw="'+esc(q.id)+'" aria-label="'+esc(t('Billetera'))+'" style="margin-top:6px;font-size:13px;padding:6px 8px">'+walletOpts(wallets(mc(q)),(qWallet(q)||{}).id)+'</select>':'')+'</span><button class="btn danger sm" type="button" data-a="qdel" data-id="'+q.id+'">'+t('Quitar')+'</button></div>';}).join('')+'</div>';
     h+='<form data-kind="quickadd"><div class="fgrid"><label class="f full"><span>'+t('Nombre')+'</span><input id="qa-name" name="name" required placeholder="'+esc(t('Ej. Desayuno'))+'"></label>'
       +'<label class="f"><span>'+t('Tipo')+'</span><select id="qa-type" name="type"><option value="Gasto">'+t('Gasto')+'</option><option value="Ingreso">'+t('Ingreso')+'</option></select></label>'
+      +walletSel(null,S.cc).replace('class="f full"','class="f"')
       +'<label class="f"><span>'+t('Monto ({c})',{c:sym})+'</span><input id="qa-amt" name="amount" inputmode="decimal" required></label>'
       +'<label class="f full"><span>'+t('Categoría')+'</span><select id="qa-cat" name="cat">'+opts(CATS,'Alimentación')+'</select></label></div>'
       +'<div class="foot"><button class="btn grow" type="submit">'+t('Agregar atajo')+'</button><button class="btn alt" type="button" data-a="close">'+t('Listo')+'</button></div></form>';
@@ -1337,11 +1346,12 @@ document.addEventListener('click',function(e){
   else if(a==='settings'){ui.sheet={kind:'settings',noFocus:true};render();}
   else if(a==='region'){ui.sheet={kind:'region',noFocus:true};render();}
   else if(a==='cur'){setBase(el.dataset.v);}
-  else if(a==='qtap'){var q=S.quicks.filter(function(x){return x.id===id;})[0];if(q){var mv={id:uid(),date:iso(new Date()),type:q.type,cat:q.cat,desc:q.name,amount:q.amount,note:'',cc:mc(q),w:(mainWallet(mc(q))||{}).id};S.moves.push(mv);ui.month=mv.date.slice(0,7);save();render();toast(t('{name} anotado',{name:q.name}),mv.id);}}
+  else if(a==='qtap'){var q=S.quicks.filter(function(x){return x.id===id;})[0];if(q){var mv={id:uid(),date:iso(new Date()),type:q.type,cat:q.cat,desc:q.name,amount:q.amount,note:'',cc:mc(q),w:(qWallet(q)||{}).id};S.moves.push(mv);ui.month=mv.date.slice(0,7);save();render();toast(t('{name} anotado',{name:q.name}),mv.id);}}
   else if(a==='social'){ui.sheet={kind:'social',noFocus:true};render();}
   else if(a==='coach-next'){if(coachI>=COACH.length-1)coachEnd();else{coachI++;coachShow();}}
   else if(a==='coach-prev'){if(coachI>0){coachI--;coachShow();}}
   else if(a==='coach-skip'){coachEnd();}
+  else if(a==='x-del'){if(!confirm(t('¿Borrar esta operación? También se quita su comisión, si tenía.')))return;S.xfers=(S.xfers||[]).filter(function(x){return x.id!==id;});S.moves=S.moves.filter(function(m){return m.xid!==id;});save();render();toast(t('Operación borrada'));}
   else if(a==='wal'){ui.wal=el.dataset.v||null;render();}
   else if(a==='cash-new'){ui.sheet={kind:'cash',noFocus:true};render();}
   else if(a==='w-new'){ui.sheet={kind:'wallet'};render();}
@@ -1384,6 +1394,7 @@ document.addEventListener('click',function(e){
 document.addEventListener('change',function(e){
   var tg=e.target;
   if(tg.id==='mcat'){ui.fcat=tg.value;render();return;}
+  if(tg.getAttribute&&tg.getAttribute('data-qw')){var qq=S.quicks.filter(function(x){return x.id===tg.getAttribute('data-qw');})[0];if(qq){qq.w=tg.value;save();toast(t('Listo'));}return;}
   if(tg.name==='wallet'){var op=tg.options[tg.selectedIndex],wcc=op&&op.getAttribute('data-cc');if(wcc){var fm3=tg.closest('form'),al3=fm3&&fm3.querySelector('[data-amtl]');if(al3)al3.textContent=t('Monto ({c})',{c:curSym(wcc)});}return;}
   if(tg.id==='w-cc'){var dl=document.getElementById('w-sug');if(dl)dl.innerHTML=wSug(tg.value).map(function(n){return '<option value="'+esc(n)+'">';}).join('');return;}
   if(tg.id==='rm-on'||tg.id==='rm-hr'){var on=document.getElementById('rm-on').checked,hr=+document.getElementById('rm-hr').value;S.remind={on:on,hour:isFinite(hr)?hr:20};save();toast(t(on?'Recordatorio activado':'Recordatorio desactivado'));return;}
@@ -1414,9 +1425,9 @@ document.addEventListener('submit',function(e){
     var wsel=(d.wallet?walletOf(d.wallet):null)||mainWallet(rec.cc||S.cc);
     if(wsel){if(lk&&mc(lk)!==wsel.cc){toast(t('La billetera y la meta o deuda deben usar la misma moneda.'));return;}rec.cc=wsel.cc;rec.w=wsel.id;}
     if(s.id)S.moves=S.moves.map(function(m){return m.id===s.id?rec:m;});else S.moves.push(rec);
-    if(d.asquick&&!s.id&&(d.type==='Gasto'||d.type==='Ingreso')&&rec.desc)S.quicks.push({id:uid(),name:rec.desc,type:d.type,cat:rec.cat,amount:rec.amount,cc:rec.cc});
+    if(d.asquick&&!s.id&&(d.type==='Gasto'||d.type==='Ingreso')&&rec.desc)S.quicks.push({id:uid(),name:rec.desc,type:d.type,cat:rec.cat,amount:rec.amount,cc:rec.cc,w:rec.w});
     if(d.repeat&&!s.id&&(d.type==='Gasto'||d.type==='Ingreso')){S.recur=S.recur||[];S.recur.push({id:uid(),type:d.type,cat:rec.cat,desc:rec.desc,amount:rec.amount,cc:rec.cc,w:rec.w,day:+rec.date.slice(8,10)||1,next:nextKey(rec.date.slice(0,7)),prior:rec.prior||undefined,fromSav:rec.fromSav||undefined});}
-    ui.month=rec.date.slice(0,7);msg=t(d.asquick&&!s.id?K('Movimiento y atajo guardados'):K('Movimiento guardado'));
+    ui.month=rec.date.slice(0,7);msg=t(d.asquick&&!s.id?K('Movimiento y atajo guardados'):K('Movimiento guardado'))+(rec.w&&walletOf(rec.w)?' · '+walletOf(rec.w).name:'');
   }else if(k==='goal'){
     var gr={id:s.id||uid(),name:d.name.trim(),target:num(d.target),initial:num(d.initial),date:d.date||'',cc:validCur(d.cc)?d.cc:S.cc,kind:d.kind==='ext'?'ext':'own',owner:d.kind==='ext'?(d.owner||'').trim().slice(0,60):''};
     if(gr.target<=0){toast(t('El monto objetivo debe ser mayor que cero'));return;}
@@ -1462,7 +1473,7 @@ document.addEventListener('submit',function(e){
     msg=t('Transferencia guardada');
   }else if(k==='quickadd'){
     var qa=num(d.amount);if(qa<=0){toast(t('Escribe un monto mayor que cero'));return;}
-    S.quicks.push({id:uid(),name:d.name.trim(),type:d.type==='Ingreso'?'Ingreso':'Gasto',cat:CATS.indexOf(d.cat)>=0?d.cat:'Otro',amount:Math.round(qa*100)/100,cc:S.cc});
+    S.quicks.push({id:uid(),name:d.name.trim(),type:d.type==='Ingreso'?'Ingreso':'Gasto',cat:CATS.indexOf(d.cat)>=0?d.cat:'Otro',amount:Math.round(qa*100)/100,cc:(walletOf(d.wallet)||mainWallet(S.cc)||{cc:S.cc}).cc,w:(walletOf(d.wallet)||mainWallet(S.cc)||{}).id});
     save();ui.sheet={kind:'quicks'};render();toast(t('Atajo agregado'));return;
   }else if(k==='quick'){
     var qm=num(d.amount);if(qm<=0){toast(t('Escribe un monto mayor que cero'));return;}
