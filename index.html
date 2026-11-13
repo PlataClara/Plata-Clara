@@ -150,9 +150,9 @@ h1,h2,h3{font-family:var(--f-display);margin:0;letter-spacing:-.01em;text-wrap:b
 .ow-hero .big{font-family:var(--f-display);font-size:34px;font-weight:700;line-height:1.1;margin:2px 0 2px}
 .ow-hero .sub{font-size:14px;color:var(--muted)}
 .ow-trio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:14px 0 10px}
-.ow-trio div{background:var(--surface2);border-radius:10px;padding:8px 10px;min-width:0}
+.ow-trio div{background:var(--surface2);border-radius:10px;padding:8px 10px;min-width:0;container-type:inline-size}
 .ow-trio small{display:block;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
-.ow-trio b{font-family:var(--f-display);font-size:15px;display:block;overflow-wrap:anywhere}
+.ow-trio b{font-family:var(--f-display);font-size:clamp(11px,calc(100cqw / (var(--len,9) * .6)),16px);display:block;white-space:nowrap}
 .ow-h{font-size:13px;text-transform:uppercase;letter-spacing:.06em;font-weight:700;color:var(--muted);margin:18px 2px 8px;display:flex;align-items:center;gap:8px}
 .ow-h.late{color:var(--exp)}
 .ow-card{border-left:4px solid var(--sav)}
@@ -281,7 +281,6 @@ label.f>*:not(span){color:var(--ink);font-weight:400}
         <div class="menu" id="menu" role="menu" hidden>
           <button type="button" class="mi" id="b-account" role="menuitem" hidden><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span id="mi-acc">Mi cuenta</span></button>
           <button type="button" class="mi" data-a="region" role="menuitem"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg><span id="mi-lang">Idioma</span></button>
-          <button type="button" class="mi" id="b-admin" data-a="admin" role="menuitem" hidden><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg><span>Dar acceso</span></button>
           <button type="button" class="mi" data-a="hogar" role="menuitem"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg><span id="mi-hog">Hogar</span></button>
           <button type="button" class="mi" id="b-soc" data-a="social" role="menuitem" hidden><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9z"/></svg><span id="mi-soc">Síguenos</span></button>
           <button type="button" class="mi" data-a="settings" role="menuitem"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span id="mi-set">Ajustes</span></button>
@@ -1114,7 +1113,7 @@ function vOwed(){
   var pc=lent>0?Math.round(got/lent*100):0;
   h+='<div class="ow-hero"><span class="stat"><span class="k">'+t('Total que te deben')+'</span></span><div class="big num c-inc">'+money(left)+'</div>'
     +'<div class="sub">'+(open.length?(open.length===1?t('1 persona te debe'):t('{n} personas te deben',{n:open.length}))+(late.length?' · <b class="c-exp">'+(late.length===1?t('1 ya venció'):t('{n} ya vencieron',{n:late.length}))+'</b>':''):t('Nadie te debe nada. ¡Todo cobrado!'))+'</div>'
-    +'<div class="ow-trio"><div><small>'+t('Prestaste')+'</small><b class="num">'+money(lent)+'</b></div><div><small>'+t('Ya cobraste')+'</small><b class="num c-inc">'+money(got)+'</b></div><div><small>'+t('Falta cobrar')+'</small><b class="num">'+money(left)+'</b></div></div>'
+    +'<div class="ow-trio"><div><small>'+t('Prestaste')+'</small><b class="num" style="--len:'+money(lent).length+'">'+money(lent)+'</b></div><div><small>'+t('Ya cobraste')+'</small><b class="num c-inc" style="--len:'+money(got).length+'">'+money(got)+'</b></div><div><small>'+t('Falta cobrar')+'</small><b class="num" style="--len:'+money(left).length+'">'+money(left)+'</b></div></div>'
     +'<div class="track"><div class="fill" style="width:'+pc+'%;background:var(--inc)"></div></div><div class="ow-line"><span>'+t('Vas recuperando tu dinero')+'</span><span>'+pc+'%</span></div></div>';
   if(late.length)h+='<div class="ow-h late">⚠ '+t('Ya venció')+' · '+late.length+'</div>'+late.sort(byDate).map(owedCard).join('');
   if(pend.length)h+='<div class="ow-h">'+t('Por cobrar')+' · '+pend.length+'</div>'+pend.sort(byDate).map(owedCard).join('');
